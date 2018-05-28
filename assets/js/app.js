@@ -80,9 +80,9 @@ $(document).ready(function(){
 	  animateSidebar();
 	  return false;
 	});
-	
+	/*
 	//load data
-	/*$.getJSON("data/boroughs.geojson", function (data) {
+	$.getJSON("data/boroughs.geojson", function (data) {
 	  boroughs.addData(data);
 	});
 	
@@ -97,10 +97,19 @@ $(document).ready(function(){
 	
 	$.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
 	  museums.addData(data);
-	});*/
+	});
+	*/
+	var southWest = L.latLng(43.08506, 3.69489),
+    northEast = L.latLng(59.46638,19.31867),
+    bounds = L.latLngBounds(southWest, northEast);
 	
 	map = L.map("map", {
-	  zoom: 10,
+	  zoom: 8,
+	  maxZoom:18,
+	  minZoom:8,
+	  maxBounds: bounds,
+	  useCache: true,
+	  crossOrigin: true,
 	  center: [48.56,8.24],
 	  layers: [cartoLight, boroughs, markerClusters, highlight],
 	  zoomControl: false,
