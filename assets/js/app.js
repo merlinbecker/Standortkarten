@@ -80,12 +80,12 @@ $(document).ready(function(){
 	  animateSidebar();
 	  return false;
 	});
-	/*
+	
 	//load data
-	$.getJSON("data/boroughs.geojson", function (data) {
+	$.getJSON("data/BW.geojson", function (data) {
 	  boroughs.addData(data);
 	});
-	
+	/*
 	$.getJSON("data/subways.geojson", function (data) {
 	  subwayLines.addData(data);
 	});
@@ -381,10 +381,17 @@ function syncSidebar() {
 }
 
 /* Basemap Layers */
+
+var cartoLight = L.tileLayer("https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+});
+/*
 var cartoLight = L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
 });
+*/
 
 var usgsImagery = L.layerGroup([L.tileLayer("http://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 15,
