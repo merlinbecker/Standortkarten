@@ -84,7 +84,104 @@
   </head>
 
   <body>
+  
+  <!-- Navigation Panel -->
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" href="#"><img src="assets/img/L-BSO.png" class="align-top" alt="BSO"></a>
+		<button class="navbar-toggler rounded-0" type="button" data-toggle="collapse" data-target="#bso_nav" aria-controls="bso_nav" aria-expanded="false" aria-label="Menü ein/ausblenden">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+	  <div class="collapse navbar-collapse" id="bso_nav">
+	  
+	  
+	  <form class="navbar-form" role="search">
+			<div class="input-group">
+					<input placeholder="z.B. Werk, Ort, PLZ" class="form-control border-secondary border-right-0 rounded-0" type="search" value="" id="example-search-input4">
+				
+				<div class="input-group-btn">
+					<button class="btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
+						<i class="fa fa-search"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+		<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+		  <li class="nav-item active">
+			<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#">Link</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link disabled" href="#">Disabled</a>
+		  </li>
+		</ul>
+		
+		<ul class="navbar-nav navbar-left">
+		  <li class="nav-item active">
+			<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#">Link</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link disabled" href="#">Disabled</a>
+		  </li>
+		</ul>
+		
+		
+		<!--
+		<form class="navbar-form" role="search">
+			<div class="row no-gutters">
+				<div class="col">
+					<input placeholder="z.B. Werk, Ort, PLZ" class="form-control border-secondary border-right-0 rounded-0" type="search" value="" id="example-search-input4">
+				</div>
+				<div class="col-auto">
+					<button class="btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
+						<i class="fa fa-search"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+		-->
+		<a class="navbar-left" href="https://www.stein-verlaggmbh.de/34-0-BSO-Baustoffe-Standorte-Online.html" target="_blank">
+		<img src="assets/img/logo_stein.png" id="logo_steinverlag"/>
+	  </a>
+		
+		
+		<!--
+		<form class="navbar-form navbar-right" role="search">
+            <div class="form-group has-feedback">
+                <input id="searchbox" type="text" placeholder="Search" class="form-control">
+                <span id="searchicon" class="fa fa-search form-control-feedback"></span>
+            </div>
+        </form>
+		-->
+		<!--<form class="form-inline my-2 my-lg-0">
+		  <input class="form-control mr-sm-2" type="search" placeholder="Search">
+		  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+		</form>
+		-->
+		
+		
+		
+		
+	  </div>
+</nav>
 	
+	<!--
+	<nav class="navbar navbar-light bg-light navbar-fixed-top">
+	  <div class="container-fluid">
+		  <div class="navbar-header">
+			  <a class="navbar-brand" href="#">
+				<img src="assets/img/L-BSO.png" class="align-top" alt="">
+			  </a>
+		  </div>
+	  </div>
+	</nav>
+	
+	-->
 	<!--
 	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container-fluid">
@@ -130,13 +227,7 @@
 	
 	-->
 
-	<!-- Navbar mit Bild und Text -->
-	<nav class="navbar navbar-light bg-light navbar-fixed-top">
-	  <a class="navbar-brand" href="#">
-		<img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="">
-		Bootstrap
-	  </a>
-	</nav>
+	
 
 	<div id="container">
 	
@@ -345,22 +436,33 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    <div class="modal fade" id="attributionModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">
-              Developed by <a href='http://bryanmcbride.com'>bryanmcbride.com</a>
-            </h4>
-          </div>
-          <div class="modal-body">
-            <div id="attribution"></div>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+	
+	
+	<!-- Modal Attribution-->
+	<!-- The Modal -->
+	<div class="modal fade" id="attributionModal">
+	  <div class="modal-dialog">
+		<div class="modal-content">
 
+		  <!-- Modal Header -->
+		  <div class="modal-header">
+			<h4 class="modal-title">&copy; 2018 <a href='https://www.stein-verlaggmbh.de/'>Stein-Verlag Baden-Baden GmbH</a></h4>
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  </div>
+
+		  <!-- Modal body -->
+		  <div class="modal-body">
+			 <div id="attribution">ahllo</div>
+		  </div>
+
+		  <!-- Modal footer -->
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-danger" data-dismiss="modal">Schließen</button>
+		  </div>
+
+		</div>
+	  </div>
+	</div>
     
   </body>
 </html>

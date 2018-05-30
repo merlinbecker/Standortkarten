@@ -8,6 +8,26 @@ body {
   height:100%;
 }
 
+.navbar{
+	border-top:1px solid black;
+	border-bottom: 1px solid black;
+	min-height:50px;
+}
+.navbar-brand img{
+	position:absolute;
+	top:5px;
+	left:5px;
+}
+.navbar-brand{
+	min-width:74px;
+}
+.navbar-toggler{
+	border-color:black!important;
+}
+#logo_steinverlag{
+	height:40px;
+}
+
 /**
 Die Navbar
 **/

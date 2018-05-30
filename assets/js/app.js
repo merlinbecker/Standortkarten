@@ -2,6 +2,7 @@ var map, featureList, boroughSearch = [], theaterSearch = [], museumSearch = [];
 var isCollapsed;
 
 $(document).ready(function(){
+	alert("document ready!");
 	sizeLayerControl();
 	$(window).resize(function() {
 	  sizeLayerControl();
@@ -66,10 +67,12 @@ $(document).ready(function(){
 	  return false;
 	});
 	
+	/*
 	$("#nav-btn").click(function() {
 	  $(".navbar-collapse").collapse("toggle");
 	  return false;
 	});
+	*/
 	
 	$("#sidebar-toggle-btn").click(function() {
 	  animateSidebar();
@@ -82,9 +85,10 @@ $(document).ready(function(){
 	});
 	
 	//load data
-	$.getJSON("data/BW.geojson", function (data) {
+	/*
+	$.getJSON("data/bundeslaender/BW.geojson", function (data) {
 	  boroughs.addData(data);
-	});
+	});*/
 	/*
 	$.getJSON("data/subways.geojson", function (data) {
 	  subwayLines.addData(data);
@@ -104,25 +108,29 @@ $(document).ready(function(){
     bounds = L.latLngBounds(southWest, northEast);
 	
 	map = L.map("map", {
-	  zoom: 8,
+	  zoom: 7,
 	  maxZoom:18,
-	  minZoom:8,
+	  minZoom:7,
 	  maxBounds: bounds,
 	  useCache: true,
 	  crossOrigin: true,
-	  center: [48.56,8.24],
-	  layers: [cartoLight, boroughs, markerClusters, highlight],
+	  center: [51,10],
+	  layers: [osmde],/*, boroughs, markerClusters, highlight],*/
 	  zoomControl: false,
-	  attributionControl: false
+	  attributionControl: true
 	});
+	
+	map.attributionControl.addAttribution("&copy; <a href='https://www.stein-verlaggmbh.de'>Stein-Verlag Baden-Baden</a>");
 
 	/* Layer control listeners that allow for a single markerClusters layer */
 	map.on("overlayadd", function(e) {
 	  if (e.layer === theaterLayer) {
+		alert("THEATERLAYER");
 		markerClusters.addLayer(theaters);
 		syncSidebar();
 	  }
 	  if (e.layer === museumLayer) {
+		alert("MUSEUMSLAYER");
 		markerClusters.addLayer(museums);
 		syncSidebar();
 	  }
@@ -286,27 +294,33 @@ $(document).ready(function(){
 		}
 	  }).on("typeahead:selected", function (obj, datum) {
 		if (datum.source === "Boroughs") {
+			alert("add layer here!!");
 		  map.fitBounds(datum.bounds);
 		}
 		if (datum.source === "Theaters") {
 		  if (!map.hasLayer(theaterLayer)) {
+			alert("add layer here!!");
 			map.addLayer(theaterLayer);
 		  }
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
+			alert("add layer here!!");
 			map._layers[datum.id].fire("click");
 		  }
 		}
 		if (datum.source === "Museums") {
 		  if (!map.hasLayer(museumLayer)) {
+			alert("add layer here!!");
 			map.addLayer(museumLayer);
 		  }
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
+			  alert("add layer here!!");
 			map._layers[datum.id].fire("click");
 		  }
 		}
 		if (datum.source === "GeoNames") {
+			alert("add layer here!!");
 		  map.setView([datum.lat, datum.lng], 14);
 		}
 		if ($(".navbar-collapse").height() > 50) {
@@ -382,28 +396,10 @@ function syncSidebar() {
 
 /* Basemap Layers */
 
-var cartoLight = L.tileLayer("https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png", {
+var osmde = L.tileLayer("https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png", {
   maxZoom: 19,
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> Mitwirkende'
 });
-/*
-var cartoLight = L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
-});
-*/
-
-var usgsImagery = L.layerGroup([L.tileLayer("http://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}", {
-  maxZoom: 15,
-}), L.tileLayer.wms("http://raster.nationalmap.gov/arcgis/services/Orthoimagery/USGS_EROS_Ortho_SCALE/ImageServer/WMSServer?", {
-  minZoom: 16,
-  maxZoom: 19,
-  layers: "0",
-  format: 'image/jpeg',
-  transparent: true,
-  attribution: "Aerial Imagery courtesy USGS"
-})]);
-
 
 /* Overlay Layers */
 var highlight = L.geoJson(null);
@@ -583,7 +579,7 @@ var attributionControl = L.control({
 });
 attributionControl.onAdd = function (map) {
   var div = L.DomUtil.create("div", "leaflet-control-attribution");
-  div.innerHTML = "<span class='hidden-xs'>Developed by <a href='http://bryanmcbride.com'>bryanmcbride.com</a> | </span><a href='#' onclick='$(\"#attributionModal\").modal(\"show\"); return false;'>Attribution</a>";
+  div.innerHTML = "<span class='hidden-xs'>2018 <a href='https://www.stein-verlaggmbh.de'>Stein-Verlag Baden-Baden</a> | </span><a href='#' onclick='$(\"#attributionModal\").modal(\"show\"); return false;'>Attribution</a>";
   return div;
 };
 
@@ -623,13 +619,16 @@ var locateControl = L.control.locate({
   }
 });
 
-var layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
+/*var layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
+  collapsed: isCollapsed
+});*/
+
+var layerControl = L.control.groupedLayers(baseLayers, {
   collapsed: isCollapsed
 });
 
 var baseLayers = {
-  "Street Map": cartoLight,
-  "Aerial Imagery": usgsImagery
+  "OSM Deutschland": osmde
 };
 
 var groupedOverlays = {
