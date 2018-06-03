@@ -4,28 +4,80 @@ html, body, #container {
   overflow: hidden;
 }
 body {
-  /*padding-top: 50px;*/
   height:100%;
 }
-
-.navbar{
+#bso_nav .input-group{
+	padding-top:2px;
+	
+}
+nav.navbar{
 	border-top:1px solid black;
 	border-bottom: 1px solid black;
 	min-height:50px;
 }
-.navbar-brand img{
+nav.navbar-brand img{
 	position:absolute;
-	top:5px;
+	top:2px;
 	left:5px;
 }
-.navbar-brand{
+nav.navbar-brand{
 	min-width:74px;
 }
-.navbar-toggler{
+nav.navbar-toggler{
 	border-color:black!important;
 }
 #logo_steinverlag{
 	height:40px;
+}
+.nav-link{
+	background-repeat:no-repeat;
+	padding-top: 34px;
+	font-size:13px;
+	padding-bottom:0px;
+	text-align:center;
+}
+
+.navbar{
+	padding-top:1px !important;
+	padding-bottom:0px !important;
+}
+
+.navbar-form{
+	margin-top:8px;
+	margin-bottom:8px;
+}
+#nav_standorte{
+	background-size:24px 32px;
+	background-image:url(../img/nav/icon_uebersicht.png);
+	background-position: center 0px;
+}
+
+#nav_umkreis{
+	background-size:32px 32px;
+	background-image:url(../img/nav/icon_umkreis.png);
+	background-position: center 2px;
+}
+
+#nav_route{
+	background-size:29px 29px;
+	background-position:center 4px;
+	background-image:url(../img/nav/icon_route.png);
+}
+#nav_hilfe{
+	background-size:29px 29px;
+	background-image:url(../img/nav/icon_info.png);
+	background-position: center 4px;
+}
+
+#nav_logout{
+	background-image:url(../img/nav/icon_logout.png);
+	background-size:23px 23px;
+	background-position:center 9px;
+}
+
+.loading-indicator{
+	text-align:center;
+	font-weight:bold;
 }
 
 /**
@@ -52,6 +104,8 @@ Die Navbar
 }*/
 
 
+
+
 input[type="radio"], input[type="checkbox"] {
   margin: 0;
 }
@@ -67,15 +121,27 @@ input[type="radio"], input[type="checkbox"] {
   height: 100%;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
+
 #loading {
   position: absolute;
-  width: 220px;
-  height: 19px;
-  top: 50%;
-  left: 50%;
-  margin: -10px 0 0 -110px;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  padding-top:15%;
+  left: auto;
   z-index: 20001;
 }
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
 #features {
   margin: 0px;
   border: none;
@@ -84,6 +150,8 @@ input[type="radio"], input[type="checkbox"] {
     box-shadow: none;
 }
 #sidebar-hide-btn {
+  float:right;
+  font-size:11px;
   margin-top: -2px;
 }
 #aboutTabsContent {
@@ -134,7 +202,7 @@ input[type="radio"], input[type="checkbox"] {
 .typeahead {
   background-color: #FFFFFF;
 }
-.tt-dropdown-menu {
+.tt-menu {
   background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px 4px 4px 4px;
@@ -144,6 +212,7 @@ input[type="radio"], input[type="checkbox"] {
   width: 100%;
   max-height: 300px;
   overflow: auto;
+  z-index:900!important;
 }
 .tt-suggestion {
   font-size: 14px;

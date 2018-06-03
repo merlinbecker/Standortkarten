@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <title>Standortkarten 2.0</title>
+    <title>BSO- Baustoffe Online</title>
 	
 	<!--jquery-->
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -46,6 +46,11 @@
 	<!-- https://github.com/ismyrnow/leaflet-groupedlayercontrol -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-groupedlayercontrol/0.6.1/leaflet.groupedlayercontrol.min.css" integrity="sha256-2nki7eLxn91r/RI3QQq+ArnIltknk6gz4wSoQHFrJnA=" crossorigin="anonymous" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-groupedlayercontrol/0.6.1/leaflet.groupedlayercontrol.min.js" integrity="sha256-jpTunCut/xbLZJF8NpoJiNL3FLfFTKv6xeGGrWo8whY=" crossorigin="anonymous"></script>
+   
+	<!--leaflet plugins: MapCenterCoord -->
+	<!-- https://github.com/xguaita/Leaflet.MapCenterCoord -->
+	<link rel="stylesheet" href="assets/Leaflet.MapCenterCoord-v0.7/L.Control.MapCenterCoord.min.css" />
+	<script src="assets/Leaflet.MapCenterCoord-v0.7/L.Control.MapCenterCoord.min.js"></script>
    
 	<!-- List.js -->
 	<!-- https://github.com/javve/list.js/blob/master/README.md -->
@@ -86,153 +91,80 @@
   <body>
   
   <!-- Navigation Panel -->
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<nav class="navbar navbar-expand-lg navbar-light bg-light" id="bso_navbar">
 		<a class="navbar-brand" href="#"><img src="assets/img/L-BSO.png" class="align-top" alt="BSO"></a>
+		
+
+		<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+		  <li class="nav-item">
+			<a class="nav-link" href="#" id="nav_standorte">Standorte</a>
+		</ul>
+		
 		<button class="navbar-toggler rounded-0" type="button" data-toggle="collapse" data-target="#bso_nav" aria-controls="bso_nav" aria-expanded="false" aria-label="Menü ein/ausblenden">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-
+		
 	  <div class="collapse navbar-collapse" id="bso_nav">
-	  
-	  
-	  <form class="navbar-form" role="search">
+		<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+		  <li class="nav-item">
+			<a class="nav-link" href="#" id="nav_umkreis">Im Umkreis</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" id="nav_route">Route planen</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" id="nav_hilfe">Hilfe/ Tour</a>
+		  </li>
+		</ul>
+		<form class="navbar-form" role="search">
 			<div class="input-group">
-					<input placeholder="z.B. Werk, Ort, PLZ" class="form-control border-secondary border-right-0 rounded-0" type="search" value="" id="example-search-input4">
-				
+					<input placeholder="z.B. Werk, Ort, PLZ" class="form-control border-secondary border-right-0 rounded-0" type="search" value="" id="searchbox">
 				<div class="input-group-btn">
 					<button class="btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
-						<i class="fa fa-search"></i>
+						<i id="searchicon" class="fa fa-search"></i>
 					</button>
 				</div>
 			</div>
 		</form>
-		<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-		  <li class="nav-item active">
-			<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link" href="#">Link</a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link disabled" href="#">Disabled</a>
-		  </li>
-		</ul>
 		
 		<ul class="navbar-nav navbar-left">
-		  <li class="nav-item active">
-			<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-		  </li>
 		  <li class="nav-item">
-			<a class="nav-link" href="#">Link</a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link disabled" href="#">Disabled</a>
+			<a class="nav-link" id="nav_logout" href="#">Logout</span></a>
 		  </li>
 		</ul>
 		
-		
-		<!--
-		<form class="navbar-form" role="search">
-			<div class="row no-gutters">
-				<div class="col">
-					<input placeholder="z.B. Werk, Ort, PLZ" class="form-control border-secondary border-right-0 rounded-0" type="search" value="" id="example-search-input4">
-				</div>
-				<div class="col-auto">
-					<button class="btn btn-outline-secondary border-left-0 rounded-0 rounded-right" type="button">
-						<i class="fa fa-search"></i>
-					</button>
-				</div>
-			</div>
-		</form>
-		-->
 		<a class="navbar-left" href="https://www.stein-verlaggmbh.de/34-0-BSO-Baustoffe-Standorte-Online.html" target="_blank">
-		<img src="assets/img/logo_stein.png" id="logo_steinverlag"/>
-	  </a>
-		
-		
-		<!--
-		<form class="navbar-form navbar-right" role="search">
-            <div class="form-group has-feedback">
-                <input id="searchbox" type="text" placeholder="Search" class="form-control">
-                <span id="searchicon" class="fa fa-search form-control-feedback"></span>
-            </div>
-        </form>
-		-->
-		<!--<form class="form-inline my-2 my-lg-0">
-		  <input class="form-control mr-sm-2" type="search" placeholder="Search">
-		  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-		</form>
-		-->
-		
-		
-		
-		
+			<img src="assets/img/logo_stein.png" id="logo_steinverlag"/>
+		</a>
 	  </div>
 </nav>
-	
-	<!--
-	<nav class="navbar navbar-light bg-light navbar-fixed-top">
-	  <div class="container-fluid">
-		  <div class="navbar-header">
-			  <a class="navbar-brand" href="#">
-				<img src="assets/img/L-BSO.png" class="align-top" alt="">
-			  </a>
-		  </div>
-	  </div>
-	</nav>
-	
-	-->
-	<!--
-	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <div class="navbar-icon-container">
-            <a href="#" class="navbar-icon pull-right visible-xs" id="nav-btn"><i class="fa fa-bars fa-lg white"></i></a>
-            <a href="#" class="navbar-icon pull-right visible-xs" id="sidebar-toggle-btn"><i class="fa fa-search fa-lg white"></i></a>
-          </div>
-          <a class="navbar-brand" href="#">BootLeaf</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="search">
-            <div class="form-group has-feedback">
-                <input id="searchbox" type="text" placeholder="Search" class="form-control">
-                <span id="searchicon" class="fa fa-search form-control-feedback"></span>
-            </div>
-          </form>
-          <ul class="nav navbar-nav">
-            <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i class="fa fa-question-circle white"></i>&nbsp;&nbsp;About</a></li>
-            <li class="dropdown">
-              <a id="toolsDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe white"></i>&nbsp;&nbsp;Tools <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="full-extent-btn"><i class="fa fa-arrows-alt"></i>&nbsp;&nbsp;Zoom To Full Extent</a></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="legend-btn"><i class="fa fa-picture-o"></i>&nbsp;&nbsp;Show Legend</a></li>
-                <li class="divider hidden-xs"></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="login-btn"><i class="fa fa-user"></i>&nbsp;&nbsp;Login</a></li>
-              </ul>
-            </li>
-            <li class="dropdown">
-                <a class="dropdown-toggle" id="downloadDrop" href="#" role="button" data-toggle="dropdown"><i class="fa fa-cloud-download white"></i>&nbsp;&nbsp;Download <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="data/boroughs.geojson" download="boroughs.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Boroughs</a></li>
-                  <li><a href="data/subways.geojson" download="subways.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Subway Lines</a></li>
-                  <li><a href="data/DOITT_THEATER_01_13SEPT2010.geojson" download="theaters.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Theaters</a></li>
-                  <li><a href="data/DOITT_MUSEUM_01_13SEPT2010.geojson" download="museums.geojson" target="_blank" data-toggle="collapse" data-target=".navbar-collapse.in"><i class="fa fa-download"></i>&nbsp;&nbsp;Museums</a></li>
-                </ul>
-            </li>
-            <li class="hidden-xs"><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="list-btn"><i class="fa fa-list white"></i>&nbsp;&nbsp;POI List</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-	
-	-->
-
-	
-
 	<div id="container">
-	
-	
-      
+	  
+	  
+	  
+	  <div id="sidebar">
+		<div class="card rounded-0" id="features">
+		  <div class="card-header "><button type="button" class="btn btn-secondary" id="sidebar-hide-btn"><i class="fa fa-chevron-left"></i></button>Standorte</div>
+		  <div class="card-body">
+		  <table class="table table-hover" id="feature-list">
+                <thead class="hidden">
+                  <tr>
+                    <th>Icon</th>
+                  </tr>
+                  <tr>
+                    <th>Name</th>
+                  </tr>
+                  <tr>
+                    <th>Chevron</th>
+                  </tr>
+                </thead>
+                <tbody class="list"></tbody>
+              </table>
+		  </div>
+		</div>
+		
+	  </div>
+	  <!--
 	  <div id="sidebar">
         <div class="sidebar-wrapper">
           <div class="panel panel-default" id="features">
@@ -269,200 +201,53 @@
           </div>
         </div>
       </div>
-
+	  -->
+		
       <div id="map"></div>
     </div>
-	
-	
-    <div id="loading">
-      <div class="loading-indicator">
-        <div class="progress progress-striped active">
-          <div class="progress-bar progress-bar-info progress-bar-full"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Welcome to the BootLeaf template!</h4>
-          </div>
-          <div class="modal-body">
-            <ul class="nav nav-tabs nav-justified" id="aboutTabs">
-              <li class="active"><a href="#about" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;About the project</a></li>
-              <li><a href="#contact" data-toggle="tab"><i class="fa fa-envelope"></i>&nbsp;Contact us</a></li>
-              <li><a href="#disclaimer" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Disclaimer</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe"></i>&nbsp;Metadata <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="#boroughs-tab" data-toggle="tab">Boroughs</a></li>
-                  <li><a href="#subway-lines-tab" data-toggle="tab">Subway Lines</a></li>
-                  <li><a href="#theaters-tab" data-toggle="tab">Theaters</a></li>
-                  <li><a href="#museums-tab" data-toggle="tab">Museums</a></li>
-                </ul>
-              </li>
-            </ul>
-            <div class="tab-content" id="aboutTabsContent">
-              <div class="tab-pane fade active in" id="about">
-                <p>A simple, responsive template for building web mapping applications with <a href="http://getbootstrap.com/">Bootstrap 3</a>, <a href="http://leafletjs.com/" target="_blank">Leaflet</a>, and <a href="http://twitter.github.io/typeahead.js/" target="_blank">typeahead.js</a>. Open source, MIT licensed, and available on <a href="https://github.com/bmcbride/bootleaf" target="_blank">GitHub</a>.</p>
-                <div class="panel panel-primary">
-                  <div class="panel-heading">Features</div>
-                  <ul class="list-group">
-                    <li class="list-group-item">Fullscreen mobile-friendly map template with responsive navbar and modal placeholders</li>
-                    <li class="list-group-item">jQuery loading of external GeoJSON files</li>
-                    <li class="list-group-item">Logical multiple layer marker clustering via the <a href="https://github.com/Leaflet/Leaflet.markercluster" target="_blank">leaflet marker cluster plugin</a></li>
-                    <li class="list-group-item">Elegant client-side multi-layer feature search with autocomplete using <a href="http://twitter.github.io/typeahead.js/" target="_blank">typeahead.js</a></li>
-                    <li class="list-group-item">Responsive sidebar feature list synced with map bounds, which includes sorting and filtering via <a href="http://listjs.com/" target="_blank">list.js</a></li>
-                    <li class="list-group-item">Marker icons included in grouped layer control via the <a href="https://github.com/ismyrnow/Leaflet.groupedlayercontrol" target="_blank">grouped layer control plugin</a></li>
-                  </ul>
-                </div>
-              </div>
-              <div id="disclaimer" class="tab-pane fade text-danger">
-                <p>The data provided on this site is for informational and planning purposes only.</p>
-                <p>Absolutely no accuracy or completeness guarantee is implied or intended. All information on this map is subject to such variations and corrections as might result from a complete title search and/or accurate field survey.</p>
-              </div>
-              <div class="tab-pane fade" id="contact">
-                <form id="contact-form">
-                  <div class="well well-sm">
-                    <div class="row">
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="first-name">First Name:</label>
-                          <input type="text" class="form-control" id="first-name">
-                        </div>
-                        <div class="form-group">
-                          <label for="last-name">Last Name:</label>
-                          <input type="text" class="form-control" id="last-email">
-                        </div>
-                        <div class="form-group">
-                          <label for="email">Email:</label>
-                          <input type="text" class="form-control" id="email">
-                        </div>
-                      </div>
-                      <div class="col-md-8">
-                        <label for="message">Message:</label>
-                        <textarea class="form-control" rows="8" id="message"></textarea>
-                      </div>
-                      <div class="col-md-12">
-                        <p>
-                          <button type="submit" class="btn btn-primary pull-right" data-dismiss="modal">Submit</button>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="tab-pane fade" id="boroughs-tab">
-                <p>Borough data courtesy of <a href="http://www.nyc.gov/html/dcp/pdf/bytes/nybbwi_metadata.pdf" target="_blank">New York City Department of City Planning</a></p>
-              </div>
-              <div class="tab-pane fade" id="subway-lines-tab">
-                <p><a href="http://spatialityblog.com/2010/07/08/mta-gis-data-update/#datalinks" target="_blank">MTA Subway data</a> courtesy of the <a href="http://www.urbanresearch.org/about/cur-components/cuny-mapping-service" target="_blank">CUNY Mapping Service at the Center for Urban Research</a></p>
-              </div>
-              <div class="tab-pane fade" id="theaters-tab">
-                <p>Theater data courtesy of <a href="https://data.cityofnewyork.us/Recreation/Theaters/kdu2-865w" target="_blank">NYC Department of Information & Telecommunications (DoITT)</a></p>
-              </div>
-              <div class="tab-pane fade" id="museums-tab">
-                <p>Museum data courtesy of <a href="https://data.cityofnewyork.us/Recreation/Museums-and-Galleries/sat5-adpb" target="_blank">NYC Department of Information & Telecommunications (DoITT)</a></p>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-    <div class="modal fade" id="legendModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Map Legend</h4>
-          </div>
-          <div class="modal-body">
-            <p>Map Legend goes here...</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Login</h4>
-          </div>
-          <div class="modal-body">
-            <form id="contact-form">
-              <fieldset>
-                <div class="form-group">
-                  <label for="name">Username:</label>
-                  <input type="text" class="form-control" id="username">
-                </div>
-                <div class="form-group">
-                  <label for="email">Password:</label>
-                  <input type="password" class="form-control" id="password">
-                </div>
-              </fieldset>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary" data-dismiss="modal">Login</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-    <div class="modal fade" id="featureModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title text-primary" id="feature-title"></h4>
-          </div>
-          <div class="modal-body" id="feature-info"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-	
-	
-	<!-- Modal Attribution-->
-	<!-- The Modal -->
-	<div class="modal fade" id="attributionModal">
-	  <div class="modal-dialog">
+	<!-- Loading Screen -->
+    <div id="loading" class="noselect">
+	  <div class="loading-indicator">
+	  <i class="fa fa-spinner fa-spin" style="font-size:48px;color:black"></i></br>
+		Standorte werden geladen...
+	  </div>
+	</div>
+	<!-- Login Screen -->
+	<div class="modal fade" id="loginModal">
+	  <div class="modal-dialog modal-sm modal-dialog-centered">
 		<div class="modal-content">
 
+		
 		  <!-- Modal Header -->
 		  <div class="modal-header">
-			<h4 class="modal-title">&copy; 2018 <a href='https://www.stein-verlaggmbh.de/'>Stein-Verlag Baden-Baden GmbH</a></h4>
-			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title"><img src="assets/img/L-BSO.gif" border="0" /></h4>
 		  </div>
 
 		  <!-- Modal body -->
 		  <div class="modal-body">
-			 <div id="attribution">ahllo</div>
+			<form class="form-signin">
+			  <h1 class="h3 mb-3 font-weight-normal">BSO Anmeldung:</h1>
+			  <label for="inputEmail" class="sr-only">E-Mail Adresse</label>
+			  <input id="inputEmail" class="form-control" placeholder="E-Mail" required="" autofocus="" type="email">
+			  <label for="inputPassword" class="sr-only">Passwort</label>
+			  <input id="inputPassword" class="form-control" placeholder="Password" required="" type="password">
+			  <br/>
+			  <button class="btn btn-lg btn-primary btn-block" type="submit">Anmelden</button>
+			  <br/><br/>
+			  <h1 class="h3 mb-3 font-weight-normal">ohne Anmeldung: </h1>
+			  <button class="btn btn-lg btn-primary btn-block" type="submit">Demo Zugang:</button>
+			  <p class="mt-5 mb-3 text-muted">© 2017-2018</p>
+			</form>
 		  </div>
 
 		  <!-- Modal footer -->
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-danger" data-dismiss="modal">Schließen</button>
+
 		  </div>
 
 		</div>
 	  </div>
 	</div>
-    
+	
   </body>
 </html>

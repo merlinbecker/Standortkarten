@@ -1,8 +1,102 @@
-var map, featureList, boroughSearch = [], theaterSearch = [], museumSearch = [];
+var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+
+var url="service.php";
+
+var map, featureList, blSearch = [],lkSearch=[],theaterSearch = [], museumSearch = [];
 var isCollapsed;
+var baseLayers;
+var groupedOverlays;
+var layerControl;
+
+/**
+backend communication functions
+**/
+function checkLogin(){
+	var data="{ \"command\": \"checkLogin\"}";
+	data={"d":Base64.encode(data)};
+	$.post(url, data ,loginChecked);
+}
+/**prüft, ob der Nutzer gerade eingeloggt ist oder nicht**/
+function isLoggedIn(data){
+	if(data.status=="success") return true;
+	else return false;
+}
+
+/* !Login Funktionen */ 
+function loginChecked(data){
+	eval("data="+Base64.decode(data));
+	currentversion=data.version;
+	$(".versionr").html("Standortkarten "+data.version);
+	
+	if(isLoggedIn(data)){
+		displayLoginForm();
+		holeInitialData();	
+		if(data.testversion=="Testversion")	{
+		testversion=true;
+			$(".testversion_hinweis").css("display","block");
+			setDocumentTitle("Standortkarten "+currentversion+" EINGESCHRÄNKTE TESTVERSION");
+		}
+		else{
+		testversion=false;
+		$(".testversion_hinweis").css("display","none");
+		setDocumentTitle("Standortkarten "+currentversion);
+		}
+	}
+	else if(data.details=="username_wrong"){
+		$("#login_overlay").effect("shake",function(){$("#loginform")[0].reset();
+			$("#logineingabe").stop().css("display","block");
+			$("#nutzername").focus();
+		});	
+	}
+	else{
+			displayLoginForm();
+	}
+}
+
+function displayLoginForm(){
+	$("#sidebar").hide();
+	$("#loading").hide();
+	$("#bso_navbar").hide();
+	
+	$("#loginModal").modal({
+		backdrop: 'static',
+		keyboard: false
+		});
+}
 
 $(document).ready(function(){
-	alert("document ready!");
+	
+	
+	checkLogin();
+	return;
+	/* some tests */
+	//
+	//$("#nav_logout").hide();
+	
+	/* Larger screens get expanded layer control and visible sidebar */
+	if (document.body.clientWidth <= 767) {
+	  isCollapsed = true;
+	} else {
+	  isCollapsed = false;
+	}
+
+	baseLayers = {
+	  "OpenStreetMaps.de": osmde
+	};
+
+	groupedOverlays = {
+	  "Länder & Kreise": {
+		"Bundesländer": bundeslaender,
+		"Landkreise":landkreise
+		}
+	};
+
+	var layerControl = L.control.groupedLayers(baseLayers,groupedOverlays, {
+	  collapsed: isCollapsed
+	});
+
+	
+	
 	sizeLayerControl();
 	$(window).resize(function() {
 	  sizeLayerControl();
@@ -37,42 +131,12 @@ $(document).ready(function(){
 	  $(document).on("mouseout", ".feature-row", clearHighlight);
 	});
 	
-	//bind buttons
-	$("#about-btn").click(function() {
-	  $("#aboutModal").modal("show");
-	  $(".navbar-collapse.in").collapse("hide");
-	  return false;
-	});
 	
-	$("#full-extent-btn").click(function() {
-	  map.fitBounds(boroughs.getBounds());
-	  $(".navbar-collapse.in").collapse("hide");
-	  return false;
-	});
 	
-	$("#legend-btn").click(function() {
-	  $("#legendModal").modal("show");
-	  $(".navbar-collapse.in").collapse("hide");
-	  return false;
-	});
-	
-	$("#login-btn").click(function() {
-	  $("#loginModal").modal("show");
-	  $(".navbar-collapse.in").collapse("hide");
-	  return false;
-	});
-	
-	$("#list-btn").click(function() {
+	$("#nav_standorte").click(function() {
 	  animateSidebar();
 	  return false;
 	});
-	
-	/*
-	$("#nav-btn").click(function() {
-	  $(".navbar-collapse").collapse("toggle");
-	  return false;
-	});
-	*/
 	
 	$("#sidebar-toggle-btn").click(function() {
 	  animateSidebar();
@@ -85,10 +149,15 @@ $(document).ready(function(){
 	});
 	
 	//load data
-	/*
+	
 	$.getJSON("data/bundeslaender/BW.geojson", function (data) {
-	  boroughs.addData(data);
-	});*/
+	  bundeslaender.addData(data);
+	});
+	
+	$.getJSON("data/landkreise/lk-bw.geojson", function (data) {
+	  landkreise.addData(data);
+	});
+	
 	/*
 	$.getJSON("data/subways.geojson", function (data) {
 	  subwayLines.addData(data);
@@ -115,11 +184,16 @@ $(document).ready(function(){
 	  useCache: true,
 	  crossOrigin: true,
 	  center: [51,10],
-	  layers: [osmde],/*, boroughs, markerClusters, highlight],*/
+	  layers: [osmde, bundeslaender],// markerClusters, highlight],*/
 	  zoomControl: false,
 	  attributionControl: true
 	});
 	
+	L.control.mapCenterCoord({
+		onMove:true
+	}).addTo(map);
+	
+	L.control.scale({metric:true,imperial:false}).addTo(map);
 	map.attributionControl.addAttribution("&copy; <a href='https://www.stein-verlaggmbh.de'>Stein-Verlag Baden-Baden</a>");
 
 	/* Layer control listeners that allow for a single markerClusters layer */
@@ -156,22 +230,12 @@ $(document).ready(function(){
 	map.on("click", function(e) {
 	  highlight.clearLayers();
 	});
-
-	map.on("layeradd", updateAttribution);
-	map.on("layerremove", updateAttribution);
-	
-	map.addControl(attributionControl);
 	
 	zoomControl.addTo(map);
 	locateControl.addTo(map);
 	layerControl.addTo(map);
 	
-	/* Larger screens get expanded layer control and visible sidebar */
-	if (document.body.clientWidth <= 767) {
-	  isCollapsed = true;
-	} else {
-	  isCollapsed = false;
-	}
+	
 	
 	// Leaflet patch to make layer control scrollable on touch browsers
 	var container = $(".leaflet-control-layers")[0];
@@ -183,25 +247,35 @@ $(document).ready(function(){
 	  L.DomEvent.disableClickPropagation(container);
 	}
 	
-		/* Typeahead search functionality */
+	/* Typeahead search functionality */
 	$(document).one("ajaxStop", function () {
 	  $("#loading").hide();
 	  sizeLayerControl();
 	  /* Fit map to boroughs bounds */
-	  map.fitBounds(boroughs.getBounds());
+	  /*map.fitBounds(bundeslaender.getBounds());*/
 	  featureList = new List("features", {valueNames: ["feature-name"]});
 	  featureList.sort("feature-name", {order:"asc"});
 
-	  var boroughsBH = new Bloodhound({
-		name: "Boroughs",
+	  var bundeslaenderBH = new Bloodhound({
+		name: "Bundesl",
 		datumTokenizer: function (d) {
 		  return Bloodhound.tokenizers.whitespace(d.name);
 		},
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
-		local: boroughSearch,
+		local: blSearch,
 		limit: 10
 	  });
-
+	  
+	  var landkreiseBH = new Bloodhound({
+		name: "Landk",
+		datumTokenizer: function (d) {
+		  return Bloodhound.tokenizers.whitespace(d.name);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		local: lkSearch,
+		limit: 10
+	  });
+	
 	  var theatersBH = new Bloodhound({
 		name: "Theaters",
 		datumTokenizer: function (d) {
@@ -229,30 +303,35 @@ $(document).ready(function(){
 		},
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		remote: {
-		  url: "http://api.geonames.org/searchJSON?username=bootleaf&featureClass=P&maxRows=5&countryCode=US&name_startsWith=%QUERY",
-		  filter: function (data) {
-			return $.map(data.geonames, function (result) {
+		  url: "http://api.geonames.org/postalCodeSearchJSON?maxRows=10&username=lordmerlo&country=DE",
+		  transform: function (data) {
+			  $("#searchicon").removeClass("fa-sync-alt fa-spin").addClass("fa-search");
+			console.log(data);
+			return $.map(data.postalCodes, function (result) {
 			  return {
-				name: result.name + ", " + result.adminCode1,
+				name: result.postalCode+" "+result.placeName + ", " + result.adminCode1,
 				lat: result.lat,
 				lng: result.lng,
 				source: "GeoNames"
 			  };
 			});
 		  },
-		  ajax: {
-			beforeSend: function (jqXhr, settings) {
-			  settings.url += "&east=" + map.getBounds().getEast() + "&west=" + map.getBounds().getWest() + "&north=" + map.getBounds().getNorth() + "&south=" + map.getBounds().getSouth();
-			  $("#searchicon").removeClass("fa-search").addClass("fa-refresh fa-spin");
-			},
-			complete: function (jqXHR, status) {
-			  $('#searchicon').removeClass("fa-refresh fa-spin").addClass("fa-search");
+		  prepare: function (query, settings) {
+			if(!isNaN(query.substring(0,4))){
+				settings.url+="&postalcode_startsWith="+encodeURIComponent(query.substring(0,4));
 			}
-		  }
+			else if(isNaN(query))
+			  settings.url+="&placename_startsWith="+encodeURIComponent(query);
+			else 
+			  settings.url+="&postalcode_startsWith="+encodeURIComponent(query);
+			$("#searchicon").removeClass("fa-search").addClass("fa-sync-alt fa-spin");
+            return settings;
+           },
 		},
 		limit: 10
 	  });
-	  boroughsBH.initialize();
+	  landkreiseBH.initialize();
+	  bundeslaenderBH.initialize();
 	  theatersBH.initialize();
 	  museumsBH.initialize();
 	  geonamesBH.initialize();
@@ -263,13 +342,23 @@ $(document).ready(function(){
 		highlight: true,
 		hint: false
 	  }, {
-		name: "Boroughs",
+		name: "Bundesl",
 		displayKey: "name",
-		source: boroughsBH.ttAdapter(),
+		source: bundeslaenderBH.ttAdapter(),
 		templates: {
-		  header: "<h4 class='typeahead-header'>Boroughs</h4>"
+		  header: "<h4 class='typeahead-header'>Bundesländer</h4>"
 		}
-	  }, {
+	  }, 
+	   {
+		name: "Landkreise",
+		displayKey: "name",
+		source: landkreiseBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'>Landkreise</h4>"
+		}
+	  }, 
+	  
+	  /*{
 		name: "Theaters",
 		displayKey: "name",
 		source: theatersBH.ttAdapter(),
@@ -285,16 +374,15 @@ $(document).ready(function(){
 		  header: "<h4 class='typeahead-header'><img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums</h4>",
 		  suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
 		}
-	  }, {
+	  },*/ {
 		name: "GeoNames",
 		displayKey: "name",
 		source: geonamesBH.ttAdapter(),
 		templates: {
-		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;GeoNames</h4>"
+		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
 		}
 	  }).on("typeahead:selected", function (obj, datum) {
-		if (datum.source === "Boroughs") {
-			alert("add layer here!!");
+		if (datum.source === "Bundesl"||datum.source === "Landkreise") {
 		  map.fitBounds(datum.bounds);
 		}
 		if (datum.source === "Theaters") {
@@ -320,7 +408,6 @@ $(document).ready(function(){
 		  }
 		}
 		if (datum.source === "GeoNames") {
-			alert("add layer here!!");
 		  map.setView([datum.lat, datum.lng], 14);
 		}
 		if ($(".navbar-collapse").height() > 50) {
@@ -410,7 +497,7 @@ var highlightStyle = {
   radius: 10
 };
 
-var boroughs = L.geoJson(null, {
+var bundeslaender = L.geoJson(null, {
   style: function (feature) {
     return {
       color: "black",
@@ -420,14 +507,39 @@ var boroughs = L.geoJson(null, {
     };
   },
   onEachFeature: function (feature, layer) {
-    boroughSearch.push({
-      name: layer.feature.properties.BoroName,
-      source: "Boroughs",
+    blSearch.push({
+      name: layer.feature.properties.GEN,
+      source: "Bundesl",
       id: L.stamp(layer),
       bounds: layer.getBounds()
     });
   }
-});
+}).bindTooltip(function (layer) {
+    return layer.feature.properties.GEN;
+ }
+);
+
+var landkreise = L.geoJson(null, {
+  style: function (feature) {
+    return {
+      color: "gray",
+      fill: false,
+      opacity: 1,
+      clickable: false
+    };
+  },
+  onEachFeature: function (feature, layer) {
+    lkSearch.push({
+      name: layer.feature.properties.GEN,
+      source: "Landkreise",
+      id: L.stamp(layer),
+      bounds: layer.getBounds()
+    });
+  }
+}).bindTooltip(function (layer) {
+    return layer.feature.properties.GEN;
+ }
+);
 
 //Create a color dictionary based off of subway route_id
 var subwayColors = {"1":"#ff3135", "2":"#ff3135", "3":"ff3135", "4":"#009b2e",
@@ -565,24 +677,6 @@ var museums = L.geoJson(null, {
 
 
 
-/* Attribution control */
-function updateAttribution(e) {
-  $.each(map._layers, function(index, layer) {
-    if (layer.getAttribution) {
-      $("#attribution").html((layer.getAttribution()));
-    }
-  });
-}
-
-var attributionControl = L.control({
-  position: "bottomright"
-});
-attributionControl.onAdd = function (map) {
-  var div = L.DomUtil.create("div", "leaflet-control-attribution");
-  div.innerHTML = "<span class='hidden-xs'>2018 <a href='https://www.stein-verlaggmbh.de'>Stein-Verlag Baden-Baden</a> | </span><a href='#' onclick='$(\"#attributionModal\").modal(\"show\"); return false;'>Attribution</a>";
-  return div;
-};
-
 var zoomControl = L.control.zoom({
   position: "bottomright"
 });
@@ -604,11 +698,11 @@ var locateControl = L.control.locate({
     clickable: false
   },
   icon: "fa fa-location-arrow",
-  metric: false,
+  metric: true,
   strings: {
-    title: "My location",
-    popup: "You are within {distance} {unit} from this point",
-    outsideMapBoundsMsg: "You seem located outside the boundaries of the map"
+    title: "Meine Position",
+    popup: "Sie befinden sich innerhalb von {distance} {unit} von diesem Punkt",
+    outsideMapBoundsMsg: "Ihre Position befindet sich außerhalb der Karte"
   },
   locateOptions: {
     maxZoom: 18,
@@ -619,28 +713,18 @@ var locateControl = L.control.locate({
   }
 });
 
-/*var layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
-  collapsed: isCollapsed
-});*/
 
-var layerControl = L.control.groupedLayers(baseLayers, {
-  collapsed: isCollapsed
-});
 
-var baseLayers = {
-  "OSM Deutschland": osmde
-};
-
-var groupedOverlays = {
+/*var groupedOverlays = {
   "Points of Interest": {
     "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters": theaterLayer,
     "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums": museumLayer
   },
   "Reference": {
-    "Boroughs": boroughs,
+    "Bundesländer": bundeslaender,
     "Subway Lines": subwayLines
   }
-};
+};*/
 
 
 
