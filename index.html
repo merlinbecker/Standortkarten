@@ -70,6 +70,7 @@
 	
 	<!-- custom css+js -->
 	<link rel="stylesheet" href="assets/css/app.css"/>
+	<script src="assets/js/Base64.js"></script>
 	<script src="assets/js/app.js"></script>
 	
 	<link rel="apple-touch-icon" sizes="57x57" href="assets/img/fav/apple-icon-57x57.png">
@@ -146,6 +147,12 @@
 		<div class="card rounded-0" id="features">
 		  <div class="card-header "><button type="button" class="btn btn-secondary" id="sidebar-hide-btn"><i class="fa fa-chevron-left"></i></button>Standorte</div>
 		  <div class="card-body">
+		  
+		  <div class="alert alert-warning" id="hinweis_testversion">
+			  <strong>Hinweis!</strong> Sie verwenden die Standortkarten App als eingeschränkte Testversion.
+			Es werden jeweils nur max. fünf Standorte pro Branche angezeigt. 
+		  </div>
+		  
 		  <table class="table table-hover" id="feature-list">
                 <thead class="hidden">
                   <tr>
@@ -201,8 +208,7 @@
           </div>
         </div>
       </div>
-	  -->
-		
+	  -->	
       <div id="map"></div>
     </div>
 	<!-- Loading Screen -->
@@ -225,24 +231,27 @@
 
 		  <!-- Modal body -->
 		  <div class="modal-body">
-			<form class="form-signin">
-			  <h1 class="h3 mb-3 font-weight-normal">BSO Anmeldung:</h1>
-			  <label for="inputEmail" class="sr-only">E-Mail Adresse</label>
-			  <input id="inputEmail" class="form-control" placeholder="E-Mail" required="" autofocus="" type="email">
-			  <label for="inputPassword" class="sr-only">Passwort</label>
-			  <input id="inputPassword" class="form-control" placeholder="Password" required="" type="password">
+			<div class="alert alert-danger" id="feedback_login">
+			  <strong>Fehler!</strong> Ihre Anmeldedaten sind nicht korrekt!
+			</div>
+		  
+			<form class="form-signin" id="loginform">
+			  <h1 class="h3 mb-3 font-weight-normal">mit Anmeldung:</h1>
+			  <label for="nutzername" class="sr-only">E-Mail Adresse</label>
+			  <input id="nutzername" class="form-control" placeholder="E-Mail" required="" autofocus="" type="email">
+			  <label for="password" class="sr-only">Passwort</label>
+			  <input id="password" class="form-control" placeholder="Password" required="" type="password">
 			  <br/>
-			  <button class="btn btn-lg btn-primary btn-block" type="submit">Anmelden</button>
+			  <button class="btn btn-lg btn-primary btn-block" type="submit">Anmelden<i id="ladebalken_login" class="fa fa-spinner fa-spin"></i></button>
 			  <br/><br/>
 			  <h1 class="h3 mb-3 font-weight-normal">ohne Anmeldung: </h1>
-			  <button class="btn btn-lg btn-primary btn-block" type="submit">Demo Zugang:</button>
-			  <p class="mt-5 mb-3 text-muted">© 2017-2018</p>
+			  <button class="btn btn-lg btn-primary btn-block" type="button" id="testaccount">Demo-Tour</button>
 			</form>
 		  </div>
 
 		  <!-- Modal footer -->
 		  <div class="modal-footer">
-
+			<a href="https://www.stein-verlaggmbh.de/?article_id=7&clang=0" target="_blank"><img src="assets/img/logo_stein.png" id="login_logo" border="0"/></a>
 		  </div>
 
 		</div>

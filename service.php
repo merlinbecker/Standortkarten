@@ -9,7 +9,6 @@ Der Webservice für die Stein Verlag Standortkarten
 **/
 error_reporting(1);
 
-
 /**
 legacy code, maybe delete
 **/
@@ -126,9 +125,66 @@ mail($empfaenger, $betreff, $nachricht, $header);
 				$laender=array();
 				if($GLOBALS['db']->antwort_anzahl>0){
 				do{
-				$GLOBALS['db']->antwort_reihe['beschreibung']=utf8_encode($GLOBALS['db']->antwort_reihe['beschreibung']);
+					$GLOBALS['db']->antwort_reihe['beschreibung']=utf8_encode($GLOBALS['db']->antwort_reihe['beschreibung']);
 					$GLOBALS['db']->antwort_reihe['selected']=in_array($GLOBALS['db']->antwort_reihe['id'], $_SESSION['nutzer']['filtersettings']['laender'])?true:false;
-				
+					
+					//lade Bundesland GeoJson je nach Typ
+					
+					switch($GLOBALS['db']->antwort_reihe['id']){
+						case 1:
+							$grenzen="data/bundeslaender/BW.geojson";
+							$lk="data/landkreise/lk-bw.geojson";
+						break;
+						case 2:
+							$grenzen="data/bundeslaender/BY.geojson";
+							$lk="data/landkreise/lk_by.geojson";
+						break;
+						case 3:
+							$grenzen="data/bundeslaender/Brandenburg-Berlin.geojson";
+							$lk="data/landkreise/lk_brandenburg-berlin.geojson";
+						break;
+						case 4:
+							$grenzen="data/bundeslaender/Hessen.geojson";
+							$lk="data/landkreise/lk_hessen.geojson";
+						break;
+						case 5:
+							$grenzen="data/bundeslaender/Meck-Vorpommern.geojson";
+							$lk="data/landkreise/lk_meck-vorpommern.geojson";
+						break;
+						case 6:
+							$grenzen="data/bundeslaender/Niedersachsen-Bremen.geojson";
+							$lk="data/landkreise/lk_niedersachsen-bremen.geojson";
+						break;
+						case 7:
+							$grenzen="data/bundeslaender/Nordrhein-Westfalen.geojson";
+							$lk="data/landkreise/lk_Nordrhein-Westfalen.geojson";
+						break;
+						case 8:
+							$grenzen="data/bundeslaender/Rheinland-Pfalz.geojson";
+							$lk="data/landkreise/lk_Rheinland-Pfalz.geojson";
+						break;
+						case 9:
+							$grenzen="data/bundeslaender/Sachsen-Anhalt.geojson";
+							$lk="data/landkreise/lk_Sachsen-Anhalt.geojson";
+						break;
+						case 10:
+							$grenzen="data/bundeslaender/Sachsen.geojson";
+							$lk="data/landkreise/lk_Sachsen.geojson";
+						break;
+						case 11:
+							$grenzen="data/bundeslaender/Schleswig-Holstein-Hamburg.geojson";
+							$lk="data/landkreise/lk_Schleswig-Holstein-Hamburg.geojson";
+						break;
+						case 12:
+							$grenzen="data/bundeslaender/Thueringen.geojson";
+							$lk="data/landkreise/lk_thueringen.geojson";
+						break;
+							
+					}
+					
+					$GLOBALS['db']->antwort_reihe['grenzen']=json_decode(file_get_contents($grenzen));
+					$GLOBALS['db']->antwort_reihe['landkreise']=json_decode(file_get_contents($lk));
+					
 					
 					$laender[]=$GLOBALS['db']->antwort_reihe;
 				}while($GLOBALS['db']->neueReihe());	

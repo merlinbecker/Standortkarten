@@ -1,12 +1,12 @@
-var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
-
 var url="service.php";
-
+var proxy="proxy.php";
 var map, featureList, blSearch = [],lkSearch=[],theaterSearch = [], museumSearch = [];
 var isCollapsed;
 var baseLayers;
 var groupedOverlays;
 var layerControl;
+
+var testversion=false;
 
 /**
 backend communication functions
@@ -16,6 +16,7 @@ function checkLogin(){
 	data={"d":Base64.encode(data)};
 	$.post(url, data ,loginChecked);
 }
+
 /**prüft, ob der Nutzer gerade eingeloggt ist oder nicht**/
 function isLoggedIn(data){
 	if(data.status=="success") return true;
@@ -26,77 +27,98 @@ function isLoggedIn(data){
 function loginChecked(data){
 	eval("data="+Base64.decode(data));
 	currentversion=data.version;
-	$(".versionr").html("Standortkarten "+data.version);
 	
 	if(isLoggedIn(data)){
-		displayLoginForm();
 		holeInitialData();	
 		if(data.testversion=="Testversion")	{
+			
 		testversion=true;
-			$(".testversion_hinweis").css("display","block");
+			$("#hinweis_testversion").show();
 			setDocumentTitle("Standortkarten "+currentversion+" EINGESCHRÄNKTE TESTVERSION");
 		}
 		else{
 		testversion=false;
-		$(".testversion_hinweis").css("display","none");
-		setDocumentTitle("Standortkarten "+currentversion);
+		$("#hinweis_testversion").hide();
+			setDocumentTitle("Standortkarten "+currentversion);
 		}
 	}
 	else if(data.details=="username_wrong"){
-		$("#login_overlay").effect("shake",function(){$("#loginform")[0].reset();
-			$("#logineingabe").stop().css("display","block");
-			$("#nutzername").focus();
-		});	
+		$("#feedback_login").show();
+		$("#loginform")[0].reset();
+		$("#nutzername").focus();
+		$("#ladebalken_login").hide();
 	}
 	else{
-			displayLoginForm();
+		displayLoginForm();
 	}
 }
 
 function displayLoginForm(){
-	$("#sidebar").hide();
-	$("#loading").hide();
-	$("#bso_navbar").hide();
-	
+	$("#feedback_login").hide();
+	$("#ladebalken_login").hide();
 	$("#loginModal").modal({
 		backdrop: 'static',
 		keyboard: false
 		});
 }
 
-$(document).ready(function(){
+function holeInitialData(){
+ 	var data="{ \"command\": \"getInitialData\"}";
+	data={"d":Base64.encode(data)};
+	$.post(url,data,initialDataReceived);
+ }
+ 
+ function initialDataReceived(data){
+	eval("data="+Base64.decode(data));
 	
-	
-	checkLogin();
-	return;
-	/* some tests */
-	//
-	//$("#nav_logout").hide();
-	
-	/* Larger screens get expanded layer control and visible sidebar */
-	if (document.body.clientWidth <= 767) {
-	  isCollapsed = true;
-	} else {
-	  isCollapsed = false;
+	if(isLoggedIn(data)){
+		$('#loginModal').modal('hide');
+		$("#bso_navbar").show();
+		enableWebApp();
 	}
+	else{
+		displayLoginForm();
+	}
+}
+function setDocumentTitle(text){
+ 	$(document).attr('title',text);
+ }
+ 
+function loggedOut(data){
+	window.location.reload();
+} 
 
-	baseLayers = {
-	  "OpenStreetMaps.de": osmde
-	};
+function enableWebApp(){
+	$("#loading").show();
+	//hole die Bundeslaender
+	var data="{ \"command\": \"getBundeslaender\"}";
+		data={"d":Base64.encode(data)};
+	$.post(url, data ,bundesland_recieve);
+}
 
+function bundesland_recieve(data){
+	alert("Bundesland_recieve");
+	eval("data="+Base64.decode(data));
+	console.log(data.data);
+	if(isLoggedIn(data)){
+		$.each(data.data, function( index, value ) {
+			bundeslaender.addData(value.grenzen);
+			landkreise.addData(value.landkreise);
+	});
+	prepareResults();
+	}
+}
+
+function prepareResults(){
 	groupedOverlays = {
 	  "Länder & Kreise": {
 		"Bundesländer": bundeslaender,
 		"Landkreise":landkreise
 		}
 	};
-
 	var layerControl = L.control.groupedLayers(baseLayers,groupedOverlays, {
 	  collapsed: isCollapsed
 	});
-
-	
-	
 	sizeLayerControl();
 	$(window).resize(function() {
 	  sizeLayerControl();
@@ -133,60 +155,11 @@ $(document).ready(function(){
 	
 	
 	
-	$("#nav_standorte").click(function() {
-	  animateSidebar();
-	  return false;
-	});
+	
 	
 	$("#sidebar-toggle-btn").click(function() {
 	  animateSidebar();
 	  return false;
-	});
-	
-	$("#sidebar-hide-btn").click(function() {
-	  animateSidebar();
-	  return false;
-	});
-	
-	//load data
-	
-	$.getJSON("data/bundeslaender/BW.geojson", function (data) {
-	  bundeslaender.addData(data);
-	});
-	
-	$.getJSON("data/landkreise/lk-bw.geojson", function (data) {
-	  landkreise.addData(data);
-	});
-	
-	/*
-	$.getJSON("data/subways.geojson", function (data) {
-	  subwayLines.addData(data);
-	});
-	
-	$.getJSON("data/DOITT_THEATER_01_13SEPT2010.geojson", function (data) {
-	  theaters.addData(data);
-	  map.addLayer(theaterLayer);
-	});
-	
-	$.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
-	  museums.addData(data);
-	});
-	*/
-	var southWest = L.latLng(43.08506, 3.69489),
-    northEast = L.latLng(59.46638,19.31867),
-    bounds = L.latLngBounds(southWest, northEast);
-	
-	map = L.map("map", {
-	  zoom: 7,
-	  maxZoom:18,
-	  minZoom:7,
-	  maxBounds: bounds,
-	  useCache: true,
-	  crossOrigin: true,
-	  center: [51,10],
-	  layers: [osmde, bundeslaender],// markerClusters, highlight],*/
-	  zoomControl: false,
-	  attributionControl: true
 	});
 	
 	L.control.mapCenterCoord({
@@ -248,8 +221,9 @@ $(document).ready(function(){
 	}
 	
 	/* Typeahead search functionality */
-	$(document).one("ajaxStop", function () {
+	//$(document).one("ajaxStop", function () {
 	  $("#loading").hide();
+	  alert("AJAXSTOP");
 	  sizeLayerControl();
 	  /* Fit map to boroughs bounds */
 	  /*map.fitBounds(bundeslaender.getBounds());*/
@@ -303,7 +277,8 @@ $(document).ready(function(){
 		},
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		remote: {
-		  url: "http://api.geonames.org/postalCodeSearchJSON?maxRows=10&username=lordmerlo&country=DE",
+		  //url: "http://api.geonames.org/postalCodeSearchJSON?maxRows=10&username=lordmerlo&country=DE",
+		  url:proxy+"?maxRows=10&username=lordmerlo&country=DE",
 		  transform: function (data) {
 			  $("#searchicon").removeClass("fa-sync-alt fa-spin").addClass("fa-search");
 			console.log(data);
@@ -422,7 +397,118 @@ $(document).ready(function(){
 	  });
 	  $(".twitter-typeahead").css("position", "static");
 	  $(".twitter-typeahead").css("display", "block");
+	//});
+	
+}
+
+$(document).ready(function(){
+	$("#sidebar").hide();
+	$("#loading").hide();
+	$("#bso_navbar").hide();
+	
+	$("#loginform").submit(function(evt){	
+		$("#ladebalken_login").show();
+		var data="{ \"command\": \"login\",\"username\":\""+$('#nutzername').val()+"\",\"passwort\":\""+$('#password').val()+"\"}";
+		data={"d":Base64.encode(data)};
+		$.post(url, data ,loginChecked);
+		evt.stopPropagation();
+		return false;
 	});
+	
+	
+	$("#testaccount").click(function(evt){
+		$("#nutzername").val("test@test.de");
+		$("#password").val("test");
+		einfuehrung=true;
+		$("#loginform").submit();
+		evt.stopPropagation();
+		return false;
+	});
+	
+	$("#nav_logout").click(function(evt){
+		if(confirm("Möchten Sie sich ausloggen?")){
+			var data="{ \"command\": \"logout\"}";
+			data={"d":Base64.encode(data)};
+			$.post(url,data,loggedOut);
+			}
+	});
+	
+	
+	
+	
+	checkLogin();
+	
+	/* Larger screens get expanded layer control and visible sidebar */
+	if (document.body.clientWidth <= 767) {
+	  isCollapsed = true;
+	} else {
+	  isCollapsed = false;
+	}
+	
+	baseLayers = {
+	  "OpenStreetMaps.de": osmde
+	};
+	
+	$("#nav_standorte").click(function() {
+	  animateSidebar();
+	  return false;
+	});
+	
+	$("#sidebar-hide-btn").click(function() {
+	  animateSidebar();
+	  return false;
+	});
+	
+	
+	var southWest = L.latLng(43.08506, 3.69489),
+    northEast = L.latLng(59.46638,19.31867),
+    bounds = L.latLngBounds(southWest, northEast);
+	
+	map = L.map("map", {
+	  zoom: 7,
+	  maxZoom:18,
+	  minZoom:7,
+	  maxBounds: bounds,
+	  useCache: true,
+	  crossOrigin: true,
+	  center: [51,10],
+	  layers: [osmde],//bundeslaender],// markerClusters, highlight],*/
+	  zoomControl: false,
+	  attributionControl: true
+	});
+	
+	return;
+	
+
+	
+	
+	
+	//load data
+	$.getJSON("data/bundeslaender/BW.geojson", function (data) {
+	  bundeslaender.addData(data);
+	});
+	
+	$.getJSON("data/landkreise/lk-bw.geojson", function (data) {
+	  landkreise.addData(data);
+	});
+	
+	/*
+	$.getJSON("data/subways.geojson", function (data) {
+	  subwayLines.addData(data);
+	});
+	
+	$.getJSON("data/DOITT_THEATER_01_13SEPT2010.geojson", function (data) {
+	  theaters.addData(data);
+	  map.addLayer(theaterLayer);
+	});
+	
+	$.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
+	  museums.addData(data);
+	});
+	*/
+	
+	
+	
 });
 
 function animateSidebar() {

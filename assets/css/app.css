@@ -26,6 +26,11 @@ nav.navbar-brand{
 nav.navbar-toggler{
 	border-color:black!important;
 }
+#login_logo{
+	position:relative;
+	left:7px;
+}
+
 #logo_steinverlag{
 	height:40px;
 }
