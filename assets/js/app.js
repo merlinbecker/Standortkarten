@@ -1,6 +1,9 @@
 var url="service.php";
 var proxy="proxy.php";
-var map, featureList, blSearch = [],lkSearch=[],theaterSearch = [], museumSearch = [];
+
+
+
+var map, featureList, blSearch = [],lkSearch=[],transportBetonSearch=[],natursteinSearch=[],kiesundsandSearch=[],asphaltSearch=[],recyclingSearch=[],theaterSearch = [], museumSearch = [];
 var isCollapsed;
 var baseLayers;
 var groupedOverlays;
@@ -8,6 +11,11 @@ var layerControl;
 
 var testversion=false;
 
+
+var selectedBranchen=new Array();
+var selectedLaender=new Array();
+var obj_layer_branchen={};
+var obj_branchen={};
 /**
 backend communication functions
 **/
@@ -97,28 +105,92 @@ function enableWebApp(){
 }
 
 function bundesland_recieve(data){
-	alert("Bundesland_recieve");
 	eval("data="+Base64.decode(data));
-	console.log(data.data);
 	if(isLoggedIn(data)){
 		$.each(data.data, function( index, value ) {
+			selectedLaender.push(value.id);
 			bundeslaender.addData(value.grenzen);
 			landkreise.addData(value.landkreise);
 	});
-	prepareResults();
+	
+	//hole die Branchen
+	var data="{ \"command\": \"getBranchen\"}";
+		data={"d":Base64.encode(data)};
+	$.post(url, data ,branchen_recieve);
+	
+	
+	}
+}
+function branchen_recieve(data){
+	eval("data="+Base64.decode(data));
+	if(isLoggedIn(data)){
+		$.each(data.data, function( index, value ) {
+			selectedBranchen.push(value.id);
+			var newBranchLayer=L.geoJson(null);
+			var obj={};
+			obj[value.id]=newBranchLayer;
+			$.extend(obj_layer_branchen, obj);
+			//Object.assign(obj_layer_branchen,obj);
+			var obj2={};
+			obj2["<span class=\"icon_branche icon_"+value.id+"\"></span>"+value.beschreibung]=newBranchLayer;
+			$.extend(obj_branchen,obj2);
+			//Object.assign(obj_branchen,obj2);
+		});
+		
+		//hole die Pins
+		var data="{\"command\":\"getPins\",\"branche\":\""+selectedBranchen.join()+"\",\"bundesland\":\""+selectedLaender.join()+"\"}";
+		data={"d":Base64.encode(data)};
+		$.post(url,data,pinsRecieved);
+	}	
+}
+function pinsRecieved(data){
+	eval("data="+Base64.decode(data));
+	if(isLoggedIn(data)){
+		$.each(data.data.features, function( index, value ) {
+			switch(parseInt(value.properties.branche)){
+				case 1:
+				branche_asphalt.addData(value);
+				break;
+				case 2:
+				branche_recycling.addData(value);
+				break;
+				case 3:
+				branche_kiesundsand.addData(value);
+				break;
+				case 4:
+				branche_naturstein.addData(value);
+				break;
+				case 5:
+				branche_transportBeton.addData(value);
+				break;
+				default:
+				theaters.addData(value);
+			}
+			
+		});
+		
+		console.log(data.data);
+		prepareResults();
 	}
 }
 
 function prepareResults(){
+	
 	groupedOverlays = {
 	  "Länder & Kreise": {
 		"Bundesländer": bundeslaender,
 		"Landkreise":landkreise
-		}
+		},
+	 "Branchen":obj_branchen
 	};
+	map.addLayer(bundeslaender);
+	
+	
 	var layerControl = L.control.groupedLayers(baseLayers,groupedOverlays, {
 	  collapsed: isCollapsed
 	});
+	
+	
 	sizeLayerControl();
 	$(window).resize(function() {
 	  sizeLayerControl();
@@ -171,28 +243,64 @@ function prepareResults(){
 
 	/* Layer control listeners that allow for a single markerClusters layer */
 	map.on("overlayadd", function(e) {
-	  if (e.layer === theaterLayer) {
-		alert("THEATERLAYER");
-		markerClusters.addLayer(theaters);
-		syncSidebar();
-	  }
-	  if (e.layer === museumLayer) {
-		alert("MUSEUMSLAYER");
-		markerClusters.addLayer(museums);
-		syncSidebar();
-	  }
+	  $.each(obj_layer_branchen, function( index, value ){
+		  if(e.layer==value){
+			 switch(parseInt(index)){
+				 case 1:
+				 markerClusters.addLayer(branche_asphalt);
+				 break;
+				 case 2:
+				 markerClusters.addLayer(branche_recycling);
+				 break;
+				 case 3:
+				 markerClusters.addLayer(branche_kiesundsand);
+				 break;
+				  case 4:
+				 markerClusters.addLayer(branche_naturstein);
+				 break;
+				 case 5:
+				 markerClusters.addLayer(branche_transportBeton);
+				 break;
+				 default:
+				 markerClusters.addLayer(theaters);
+				 break;
+				 
+			 } 
+			  
+			  
+			
+			syncSidebar();
+		  }
+	  });
 	});
 
 	map.on("overlayremove", function(e) {
-	  if (e.layer === theaterLayer) {
-		markerClusters.removeLayer(theaters);
+		 $.each(obj_layer_branchen, function( index, value ){
+		if(e.layer==value){
+			 switch(parseInt(index)){
+				 case 1:
+				 markerClusters.removeLayer(branche_asphalt);
+				 break;
+				 case 2:
+				 markerClusters.removeLayer(branche_recycling);
+				 break;
+				  case 3:
+				 markerClusters.removeLayer(branche_kiesundsand);
+				 break;
+				  case 4:
+				 markerClusters.removeLayer(branche_naturstein);
+				 break;
+				  case 5:
+				 markerClusters.removeLayer(branche_transportBeton);
+				 break;
+				 default:
+				 markerClusters.removeLayer(theaters);
+				 break;
+				 
+			 }
 		syncSidebar();
 	  }
-	  if (e.layer === museumLayer) {
-		markerClusters.removeLayer(museums);
-		syncSidebar();
-	  }
-	});
+	});});
 
 	/* Filter sidebar feature list to only show features in current map bounds */
 	map.on("moveend", function (e) {
@@ -223,7 +331,6 @@ function prepareResults(){
 	/* Typeahead search functionality */
 	//$(document).one("ajaxStop", function () {
 	  $("#loading").hide();
-	  alert("AJAXSTOP");
 	  sizeLayerControl();
 	  /* Fit map to boroughs bounds */
 	  /*map.fitBounds(bundeslaender.getBounds());*/
@@ -249,6 +356,53 @@ function prepareResults(){
 		local: lkSearch,
 		limit: 10
 	  });
+	var asphaltBH=new Bloodhound({
+		name: "Asphalt",
+		datumTokenizer: function (d) {
+		  return Bloodhound.tokenizers.whitespace(d.name);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		local: asphaltSearch,
+		limit: 10
+	  });
+	  var transportBetonBH=new Bloodhound({
+		name: "TransportBeton",
+		datumTokenizer: function (d) {
+		  return Bloodhound.tokenizers.whitespace(d.name);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		local: transportBetonSearch,
+		limit: 10
+	  });
+	  var natursteinBH=new Bloodhound({
+		name: "Naturstein",
+		datumTokenizer: function (d) {
+		  return Bloodhound.tokenizers.whitespace(d.name);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		local: natursteinSearch,
+		limit: 10
+	  });
+	  var recyclingBH=new Bloodhound({
+		name: "Baustoff-Recycling",
+		datumTokenizer: function (d) {
+		  return Bloodhound.tokenizers.whitespace(d.name);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		local: recyclingSearch,
+		limit: 10
+	  });
+	  
+	  var kiesundSandBH=new Bloodhound({
+		name: "Kies und Sand",
+		datumTokenizer: function (d) {
+		  return Bloodhound.tokenizers.whitespace(d.name);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		local: kiesundsandSearch,
+		limit: 10
+	  });
+	
 	
 	  var theatersBH = new Bloodhound({
 		name: "Theaters",
@@ -307,6 +461,11 @@ function prepareResults(){
 	  });
 	  landkreiseBH.initialize();
 	  bundeslaenderBH.initialize();
+	  asphaltBH.initialize();
+	  transportBetonBH.initialize();
+	  natursteinBH.initialize();
+	  recyclingBH.initialize();
+	  kiesundSandBH.initialize();
 	  theatersBH.initialize();
 	  museumsBH.initialize();
 	  geonamesBH.initialize();
@@ -330,6 +489,46 @@ function prepareResults(){
 		source: landkreiseBH.ttAdapter(),
 		templates: {
 		  header: "<h4 class='typeahead-header'>Landkreise</h4>"
+		}
+	  }, 
+	  {
+		name: "Asphalt",
+		displayKey: "name",
+		source: asphaltBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'>Asphalt</h4>"
+		}
+	  }, 
+	  {
+		name: "TransportBeton",
+		displayKey: "name",
+		source: transportBetonBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'>Transportbeton</h4>"
+		}
+	  }, 
+	  {
+		name: "Naturstein",
+		displayKey: "name",
+		source: natursteinBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'>Naturstein</h4>"
+		}
+	  }, 
+	  {
+		name: "BaustoffRecycling",
+		displayKey: "name",
+		source: recyclingBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'>Baustoff-Recycling</h4>"
+		}
+	  }, 
+	  {
+		name: "KiesundSand",
+		displayKey: "name",
+		source: kiesundSandBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'>Kies und Sand</h4>"
 		}
 	  }, 
 	  
@@ -360,17 +559,52 @@ function prepareResults(){
 		if (datum.source === "Bundesl"||datum.source === "Landkreise") {
 		  map.fitBounds(datum.bounds);
 		}
-		if (datum.source === "Theaters") {
-		  if (!map.hasLayer(theaterLayer)) {
-			alert("add layer here!!");
-			map.addLayer(theaterLayer);
+		if (datum.source === "Asphalt") {
+		  if (!map.hasLayer(obj_layer_branchen[1])) {
+			map.addLayer(obj_layer_branchen[1]);
 		  }
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
-			alert("add layer here!!");
 			map._layers[datum.id].fire("click");
 		  }
 		}
+		if (datum.source === "Naturstein") {
+		  if (!map.hasLayer(obj_layer_branchen[4])) {
+			map.addLayer(obj_layer_branchen[4]);
+		  }
+		  map.setView([datum.lat, datum.lng], 17);
+		  if (map._layers[datum.id]) {
+			map._layers[datum.id].fire("click");
+		  }
+		}
+		if (datum.source === "TransportBeton") {
+		  if (!map.hasLayer(obj_layer_branchen[5])) {
+			map.addLayer(obj_layer_branchen[5]);
+		  }
+		  map.setView([datum.lat, datum.lng], 17);
+		  if (map._layers[datum.id]) {
+			map._layers[datum.id].fire("click");
+		  }
+		}
+		if (datum.source === "BaustoffRecycling") {
+		  if (!map.hasLayer(obj_layer_branchen[2])) {
+			map.addLayer(obj_layer_branchen[2]);
+		  }
+		  map.setView([datum.lat, datum.lng], 17);
+		  if (map._layers[datum.id]) {
+			map._layers[datum.id].fire("click");
+		  }
+		}
+		if (datum.source === "KiesundSand") {
+		  if (!map.hasLayer(obj_layer_branchen[3])) {
+			map.addLayer(obj_layer_branchen[3]);
+		  }
+		  map.setView([datum.lat, datum.lng], 17);
+		  if (map._layers[datum.id]) {
+			map._layers[datum.id].fire("click");
+		  }
+		}
+		
 		if (datum.source === "Museums") {
 		  if (!map.hasLayer(museumLayer)) {
 			alert("add layer here!!");
@@ -398,7 +632,8 @@ function prepareResults(){
 	  $(".twitter-typeahead").css("position", "static");
 	  $(".twitter-typeahead").css("display", "block");
 	//});
-	
+	$("#sidebar").show();
+	syncSidebar();
 }
 
 $(document).ready(function(){
@@ -472,35 +707,19 @@ $(document).ready(function(){
 	  useCache: true,
 	  crossOrigin: true,
 	  center: [51,10],
-	  layers: [osmde],//bundeslaender],// markerClusters, highlight],*/
+	  layers: [osmde,markerClusters,highlight],//bundeslaender],// , ],*/
 	  zoomControl: false,
 	  attributionControl: true
 	});
 	
 	return;
 	
-
-	
-	
-	
-	//load data
-	$.getJSON("data/bundeslaender/BW.geojson", function (data) {
-	  bundeslaender.addData(data);
-	});
-	
-	$.getJSON("data/landkreise/lk-bw.geojson", function (data) {
-	  landkreise.addData(data);
-	});
-	
 	/*
 	$.getJSON("data/subways.geojson", function (data) {
 	  subwayLines.addData(data);
 	});
 	
-	$.getJSON("data/DOITT_THEATER_01_13SEPT2010.geojson", function (data) {
-	  theaters.addData(data);
-	  map.addLayer(theaterLayer);
-	});
+
 	
 	$.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
 	  museums.addData(data);
@@ -543,18 +762,53 @@ function syncSidebar() {
   /* Empty sidebar features */
   $("#feature-list tbody").empty();
   /* Loop through theaters layer and add only features which are in the map bounds */
-  theaters.eachLayer(function (layer) {
-    if (map.hasLayer(theaterLayer)) {
+  branche_asphalt.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[1])) {
       if (map.getBounds().contains(layer.getLatLng())) {
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/theater.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+		  var css_class="icon_1";
+		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
+		  
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
     }
   });
-  /* Loop through museums layer and add only features which are in the map bounds */
-  museums.eachLayer(function (layer) {
-    if (map.hasLayer(museumLayer)) {
+  branche_naturstein.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[4])) {
       if (map.getBounds().contains(layer.getLatLng())) {
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/museum.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+		  var css_class="icon_4";
+		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
+		  
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+      }
+    }
+  });
+  branche_transportBeton.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[5])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_5";
+		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
+		  
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+      }
+    }
+  });
+  branche_recycling.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[2])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_2";
+		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
+		  
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+      }
+    }
+  });
+   branche_kiesundsand.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[3])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_3";
+		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
+		  
+        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
     }
   });
@@ -565,7 +819,9 @@ function syncSidebar() {
   featureList.sort("feature-name", {
     order: "asc"
   });
-}
+ 
+  $("#features").css("max-height",$("body").height()-$(".navbar").outerHeight()); 
+  }
 
 /* Basemap Layers */
 
@@ -578,10 +834,13 @@ var osmde = L.tileLayer("https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{
 var highlight = L.geoJson(null);
 var highlightStyle = {
   stroke: false,
-  fillColor: "#00FFFF",
+  fillColor: "#000000",
   fillOpacity: 0.7,
   radius: 10
 };
+
+
+
 
 var bundeslaender = L.geoJson(null, {
   style: function (feature) {
@@ -684,6 +943,309 @@ var markerClusters = new L.MarkerClusterGroup({
 });
 
 /* Empty layer placeholder to add to layer control for listening when to add/remove theaters to markerClusters layer */
+//Asphalt
+var zweitwerkIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var asphaltIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var recyclingIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+var kiesundSandIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+var natursteinIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-black.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var transportBetonIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var branche_asphalt = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	var ic=asphaltIcon;
+	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
+    return L.marker(latlng, {
+      icon:ic,
+      title: feature.properties.id+": "+feature.properties.Name1,
+      riseOnHover: true
+    }).bindTooltip(function (layer) {
+    return layer.feature.properties.Name1;
+ },{permanent: true, opacity: 0.9});
+  },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
+	  content+="<tr><th>Werk:</th><td>" ;
+		if(feature.properties.Art=="HW")content+="Hauptwerk";
+		else content+="Zweitwerk";
+		content+="</td></tr>";
+	  
+		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
+		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
+		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
+		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
+		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
+		content+=feature.properties.PLZPostfach+"</td></tr>";
+		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
+		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
+		content+="</table>";
+      layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.Name1);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+        }
+      });
+      asphaltSearch.push({
+        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
+        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
+        source: "Asphalt",
+        id: L.stamp(layer),
+        lat: layer.feature.geometry.coordinates[1],
+        lng: layer.feature.geometry.coordinates[0]
+      });
+    }
+  }
+});
+
+var branche_transportBeton = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	var ic=transportBetonIcon;
+	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
+    return L.marker(latlng, {
+      icon:ic,
+      title: feature.properties.id+": "+feature.properties.Name1,
+      riseOnHover: true
+    }).bindTooltip(function (layer) {
+    return layer.feature.properties.Name1;
+ },{permanent: true, opacity: 0.9});
+  },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
+	  content+="<tr><th>Werk:</th><td>" ;
+		if(feature.properties.Art=="HW")content+="Hauptwerk";
+		else content+="Zweitwerk";
+		content+="</td></tr>";
+	  
+		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
+		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
+		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
+		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
+		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
+		content+=feature.properties.PLZPostfach+"</td></tr>";
+		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
+		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
+		content+="</table>";
+      layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.Name1);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+        }
+      });
+      transportBetonSearch.push({
+        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
+        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
+        source: "TransportBeton",
+        id: L.stamp(layer),
+        lat: layer.feature.geometry.coordinates[1],
+        lng: layer.feature.geometry.coordinates[0]
+      });
+    }
+  }
+});
+
+var branche_naturstein = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	var ic=natursteinIcon;
+	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
+    return L.marker(latlng, {
+      icon:ic,
+      title: feature.properties.id+": "+feature.properties.Name1,
+      riseOnHover: true
+    }).bindTooltip(function (layer) {
+    return layer.feature.properties.Name1;
+ },{permanent: true, opacity: 0.9});
+  },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
+	  content+="<tr><th>Werk:</th><td>" ;
+		if(feature.properties.Art=="HW")content+="Hauptwerk";
+		else content+="Zweitwerk";
+		content+="</td></tr>";
+	  
+		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
+		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
+		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
+		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
+		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
+		content+=feature.properties.PLZPostfach+"</td></tr>";
+		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
+		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
+		content+="</table>";
+      layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.Name1);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+        }
+      });
+      natursteinSearch.push({
+        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
+        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
+        source: "Naturstein",
+        id: L.stamp(layer),
+        lat: layer.feature.geometry.coordinates[1],
+        lng: layer.feature.geometry.coordinates[0]
+      });
+    }
+  }
+});
+
+
+var branche_kiesundsand = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	var ic=kiesundSandIcon;
+	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
+    return L.marker(latlng, {
+      icon:ic,
+      title: feature.properties.id+": "+feature.properties.Name1,
+      riseOnHover: true
+    }).bindTooltip(function (layer) {
+    return layer.feature.properties.Name1;
+ },{permanent: true, opacity: 0.9});
+  },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
+	  content+="<tr><th>Werk:</th><td>" ;
+		if(feature.properties.Art=="HW")content+="Hauptwerk";
+		else content+="Zweitwerk";
+		content+="</td></tr>";
+	  
+		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
+		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
+		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
+		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
+		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
+		content+=feature.properties.PLZPostfach+"</td></tr>";
+		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
+		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
+		content+="</table>";
+      layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.Name1);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+        }
+      });
+      kiesundsandSearch.push({
+        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
+        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
+        source: "KiesundSand",
+        id: L.stamp(layer),
+        lat: layer.feature.geometry.coordinates[1],
+        lng: layer.feature.geometry.coordinates[0]
+      });
+    }
+  }
+});
+
+
+var branche_recycling = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	var ic=recyclingIcon;
+	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
+    return L.marker(latlng, {
+      icon:ic,
+      title: feature.properties.id+": "+feature.properties.Name1,
+      riseOnHover: true
+    }).bindTooltip(function (layer) {
+    return layer.feature.properties.Name1;
+ },{permanent: true, opacity: 0.9});
+  },
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
+	  content+="<tr><th>Werk:</th><td>" ;
+		if(feature.properties.Art=="HW")content+="Hauptwerk";
+		else content+="Zweitwerk";
+		content+="</td></tr>";
+	  
+		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
+		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
+		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
+		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
+		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
+		content+=feature.properties.PLZPostfach+"</td></tr>";
+		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
+		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
+		content+="</table>";
+      layer.on({
+        click: function (e) {
+          $("#feature-title").html(feature.properties.Name1);
+          $("#feature-info").html(content);
+          $("#featureModal").modal("show");
+          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+        }
+      });
+      recyclingSearch.push({
+        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
+        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
+        source: "BaustoffRecycling",
+        id: L.stamp(layer),
+        lat: layer.feature.geometry.coordinates[1],
+        lng: layer.feature.geometry.coordinates[0]
+      });
+    }
+  }
+});
+
+
+
+
 var theaterLayer = L.geoJson(null);
 var theaters = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {

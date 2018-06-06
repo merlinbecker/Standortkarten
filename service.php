@@ -313,6 +313,7 @@ mail($empfaenger, $betreff, $nachricht, $header);
 					}
 					
 					$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,branche FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE (".filternachBranchen().") AND (".implode("OR",$kriterium). ") ORDER by lat DESC";
+					$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,branche FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE (".filternachBranchen().") AND (".implode("OR",$kriterium). ") ORDER by lat DESC";
 					$GLOBALS['db']->neueAnfrage($anfrage);
 					
 					if($GLOBALS['db']->antwort_anzahl>0){
@@ -360,9 +361,12 @@ mail($empfaenger, $betreff, $nachricht, $header);
 				
 				$anfrage="UPDATE _sk_nutzer SET last_filter='".serialize($filtersettings)."' WHERE id=".$_SESSION['nutzer']['id'];
 				$GLOBALS['db']->neueAnfrage($anfrage);				
-				$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,branche FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE ".filternachBranchen()." ORDER by lat DESC";
+				//$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,branche FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE ".filternachBranchen()." ORDER by lat DESC";
+				$anfrage="SELECT * FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE ".filternachBranchen()." ORDER by lat DESC";
 				$GLOBALS['db']->neueAnfrage($anfrage);
 				
+				$result['data']['type']="FeatureCollection";
+				$result['data']['features']=array();
 				
 				if($GLOBALS['db']->antwort_anzahl>0){
 				
@@ -374,12 +378,28 @@ mail($empfaenger, $betreff, $nachricht, $header);
 					TODO:
 					beim nächsten mal muss das hier weg!!
 					**/
-						$GLOBALS['db']->antwort_reihe['Name1']=utf8_encode($GLOBALS['db']->antwort_reihe['Name1']);	
-						$GLOBALS['db']->antwort_reihe['Name2']=utf8_encode($GLOBALS['db']->antwort_reihe['Name2']);	
-						$GLOBALS['db']->antwort_reihe['Name3']=utf8_encode($GLOBALS['db']->antwort_reihe['Name3']);	
-					/*}
-           */
-						$result['data'][]=$GLOBALS['db']->antwort_reihe;	
+					$temp['type']="Feature";
+					$temp['id']=$GLOBALS['db']->antwort_reihe['id'];
+					
+					foreach($GLOBALS['db']->antwort_reihe as &$value){
+							$value=utf8_encode($value);
+                
+					}
+					
+					$GLOBALS['db']->antwort_reihe['type']="Feature";
+					/*$GLOBALS['db']->antwort_reihe['Name1']=utf8_encode($GLOBALS['db']->antwort_reihe['Name1']);	
+					$GLOBALS['db']->antwort_reihe['Name2']=utf8_encode($GLOBALS['db']->antwort_reihe['Name2']);	
+					$GLOBALS['db']->antwort_reihe['Name3']=utf8_encode($GLOBALS['db']->antwort_reihe['Name3']);	*/
+					$temp['properties']=$GLOBALS['db']->antwort_reihe;
+					
+					$geom['type']="Point";
+					$geom['coordinates']=array();
+					$geom['coordinates'][]=$GLOBALS['db']->antwort_reihe['lng'];
+					$geom['coordinates'][]=$GLOBALS['db']->antwort_reihe['lat'];
+					
+					$temp['geometry']=$geom;
+					
+					$result['data']['features'][]=$temp;	
 					
 					}while($GLOBALS['db']->neueReihe());
 					$result['status']="success";

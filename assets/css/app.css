@@ -51,6 +51,40 @@ nav.navbar-toggler{
 	margin-top:8px;
 	margin-bottom:8px;
 }
+.icon_zweitwerk{
+	background-color:gray;
+}
+.icon_branche_tbl{
+	background-repeat:no-repeat;
+	padding-left: 7px;
+	background-position: center 0px;
+	background-size:auto 15px;
+}
+.icon_branche{
+	background-repeat:no-repeat;
+	padding-left: 25px;
+	margin-right:5px;
+	background-position: center 0px;
+	background-size:auto 15px;
+}
+
+.icon_1,.icon_7{
+	background-color:yellow;
+}
+.icon_3{
+	background-color:DarkOrchid;
+}
+.icon_4,.icon_8{
+	background-color:MidnightBlue;
+}
+.icon_5,.icon_6{
+	background-color:LightBlue;
+}
+.icon_2{
+	background-color:SeaGreen;
+}
+
+
 #nav_standorte{
 	background-size:24px 32px;
 	background-image:url(../img/nav/icon_uebersicht.png);
@@ -153,6 +187,12 @@ input[type="radio"], input[type="checkbox"] {
   border-radius: 0px;
   -webkit-box-shadow: none;
     box-shadow: none;
+}
+#features .card-body{
+	overflow-y:scroll;
+	height:100%;
+	padding-left:0px;
+	padding-right:4px;
 }
 #sidebar-hide-btn {
   float:right;
