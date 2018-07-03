@@ -685,11 +685,14 @@ $(document).ready(function(){
 	};
 	
 	$("#nav_standorte").click(function() {
-	  animateSidebar();
+	  if($("#sidebar").is(":hidden"))
+		animateSidebar();
+	
+	//standorte einblenden
 	  return false;
 	});
 	
-	$("#sidebar-hide-btn").click(function() {
+	$(".sidebar-hide-btn").click(function() {
 	  animateSidebar();
 	  return false;
 	});
@@ -1023,7 +1026,7 @@ var branche_asphalt = L.geoJson(null, {
 		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
 		content+=feature.properties.PLZPostfach+"</td></tr>";
 		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
-		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
+		content+="<tr><th>Internet:</th><td><a class='url-break' href='http://"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
 		content+="</table>";
       layer.on({
         click: function (e) {

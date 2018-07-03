@@ -194,7 +194,7 @@ input[type="radio"], input[type="checkbox"] {
 	padding-left:0px;
 	padding-right:4px;
 }
-#sidebar-hide-btn {
+.sidebar-hide-btn {
   float:right;
   font-size:11px;
   margin-top: -2px;

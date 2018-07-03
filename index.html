@@ -144,8 +144,9 @@
 	  
 	  
 	  <div id="sidebar">
+	  
 		<div class="card rounded-0" id="features">
-		  <div class="card-header "><button type="button" class="btn btn-secondary" id="sidebar-hide-btn"><i class="fa fa-chevron-left"></i></button>Standorte</div>
+		  <div class="card-header "><button type="button" class="btn btn-secondary sidebar-hide-btn" ><i class="fa fa-chevron-left"></i></button>Standorte</div>
 		  <div class="card-body">
 		  
 		  <div class="alert alert-warning" id="hinweis_testversion">
@@ -159,46 +160,66 @@
 		  </div>
 		</div>
 		
+		<div class="card rounded-0" id="umkreis">
+		  <div class="card-header "><button type="button" class="btn btn-secondary sidebar-hide-btn" ><i class="fa fa-chevron-left"></i></button>Im Umkreis</div>
+		  <div class="card-body">
+				<form>
+				  <div class="form-group">
+					<label for="uks_standort">Standort:</label>
+					<input type="text" class="form-control" id="uks_standort" placeholder="Adresse...">
+				  </div>
+				  
+						  
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" type="radio" name="inlineRadioOptions" id="umkreisRadio1" value="km" checked="checked">
+				  <label class="form-check-label" for="inlineRadio1">Entfernung</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" type="radio" name="inlineRadioOptions" id="umkreisRadio2" value="min"  >
+				  <label class="form-check-label" for="inlineRadio2">Zeit</label>
+				</div>
+				 <div class="form-group">
+				<select class="form-control form-control-lg">
+					  <option value="10">10 km</option>
+					  <option value="20">20 km</option>
+					  <option value="30">30 km</option>
+					  <option value="50">50 km</option>
+					  <option value="100">100 km</option>
+					  <option value="200">200 km</option>
+					</select>
+				<select class="form-control form-control-lg">
+					  <option value="30">30 min</option>
+					  <option value="60">60 min</option>
+					  <option value="90">90 min</option>
+					  <option value="120">120 min</option>
+				</select>
+				</div>
+				  <button type="submit" class="btn btn-primary">Im Umkreis suchen</button>
+				</form>
+		  </div>
+		</div>
+		
+		<div class="card rounded-0" id="route">
+		  <div class="card-header "><button type="button" class="btn btn-secondary sidebar-hide-btn" ><i class="fa fa-chevron-left"></i></button>Route planen</div>
+		  <div class="card-body">
+				<form>
+				  <div class="form-group">
+					<label for="route_start">Start:</label>
+					<input type="text" class="form-control" id="route_start" placeholder="Start">
+				  </div>
+				   <div class="form-group">
+					<label for="route_ziel">Ziel:</label>
+					<input type="text" class="form-control" id="route_ziel" placeholder="Ziel">
+				  </div>
+				 
+				  <button type="submit" class="btn btn-primary">Route planen</button>
+				  <button type="button" title="Start und Ziel vertauschen" class="btn btn-secondary route-swap-btn" ><i class="fa fa-retweet"></i></button>
+				</form>
+		  </div>
+		</div>
+		
 	  </div>
-	  <!--
-	  <div id="sidebar">
-        <div class="sidebar-wrapper">
-          <div class="panel panel-default" id="features">
-            <div class="panel-heading">
-              <h3 class="panel-title">Points of Interest
-              <button type="button" class="btn btn-xs btn-default pull-right" id="sidebar-hide-btn"><i class="fa fa-chevron-left"></i></button></h3>
-            </div>
-            <div class="panel-body">
-              <div class="row">
-                <div class="col-xs-8 col-md-8">
-                  <input type="text" class="form-control search" placeholder="Filter" />
-                </div>
-                <div class="col-xs-4 col-md-4">
-                  <button type="button" class="btn btn-primary pull-right sort" data-sort="feature-name" id="sort-btn"><i class="fa fa-sort"></i>&nbsp;&nbsp;Sort</button>
-                </div>
-              </div>
-            </div>
-            <div class="sidebar-table">
-              <table class="table table-hover" id="feature-list">
-                <thead class="hidden">
-                  <tr>
-                    <th>Icon</th>
-                  </tr>
-                  <tr>
-                    <th>Name</th>
-                  </tr>
-                  <tr>
-                    <th>Chevron</th>
-                  </tr>
-                </thead>
-                <tbody class="list"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-	  -->	
-      <div id="map"></div>
+	  <div id="map"></div>
     </div>
 	<!-- Loading Screen -->
     <div id="loading" class="noselect">
