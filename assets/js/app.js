@@ -1,8 +1,6 @@
 var url="service.php";
 var proxy="proxy.php";
 
-
-
 var map, featureList, blSearch = [],lkSearch=[],transportBetonSearch=[],natursteinSearch=[],kiesundsandSearch=[],asphaltSearch=[],recyclingSearch=[],theaterSearch = [], museumSearch = [];
 var isCollapsed;
 var baseLayers;
@@ -531,24 +529,7 @@ function prepareResults(){
 		  header: "<h4 class='typeahead-header'>Kies und Sand</h4>"
 		}
 	  }, 
-	  
-	  /*{
-		name: "Theaters",
-		displayKey: "name",
-		source: theatersBH.ttAdapter(),
-		templates: {
-		  header: "<h4 class='typeahead-header'><img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters</h4>",
-		  suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
-		}
-	  }, {
-		name: "Museums",
-		displayKey: "name",
-		source: museumsBH.ttAdapter(),
-		templates: {
-		  header: "<h4 class='typeahead-header'><img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums</h4>",
-		  suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
-		}
-	  },*/ {
+	   {
 		name: "GeoNames",
 		displayKey: "name",
 		source: geonamesBH.ttAdapter(),
@@ -685,11 +666,45 @@ $(document).ready(function(){
 	};
 	
 	$("#nav_standorte").click(function() {
+	  $("#features").show();
+	  $("#umkreis").hide();
+	  $("#route").hide();
 	  if($("#sidebar").is(":hidden"))
 		animateSidebar();
+	return false;
+	});
 	
-	//standorte einblenden
-	  return false;
+	$("#nav_umkreis").click(function(){
+		$("#features").hide();
+	  $("#umkreis").show();
+	  $("#route").hide();
+	  if($("#sidebar").is(":hidden"))
+		animateSidebar();
+	return false;
+	});
+	
+	$("#nav_route").click(function(){
+		$("#features").hide();
+	  $("#umkreis").hide();
+	  $("#route").show();
+	  if($("#sidebar").is(":hidden"))
+		animateSidebar();
+	return false;
+	});
+	
+	$("#umkreisRadio1").click(function(){
+		$("#umkreis_select_km").show();
+		$("#umkreis_select_min").hide();
+	});
+	$("#umkreisRadio2s").click(function(){
+		$("#umkreis_select_km").hide();
+		$("#umkreis_select_min").show();
+	});
+	
+	$("#uk_mitte").click(function(evt){
+		mitte=L.latLng(map.getCenter());
+		console.log("Kartenmitte wurde geklickt");
+		console.log(L.latLng(map.getCenter()));
 	});
 	
 	$(".sidebar-hide-btn").click(function() {
@@ -716,20 +731,6 @@ $(document).ready(function(){
 	});
 	
 	return;
-	
-	/*
-	$.getJSON("data/subways.geojson", function (data) {
-	  subwayLines.addData(data);
-	});
-	
-
-	
-	$.getJSON("data/DOITT_MUSEUM_01_13SEPT2010.geojson", function (data) {
-	  museums.addData(data);
-	});
-	*/
-	
-	
 	
 });
 

@@ -84,6 +84,21 @@ nav.navbar-toggler{
 	background-color:SeaGreen;
 }
 
+#umkreis{
+	display:none;
+}
+#route{
+	display:none;
+}
+#umkreis_select_min{
+	display:none;
+}
+#uk_mitte{
+	margin-right:2px;
+}
+#uk_mitte,#uk_position{
+	float:right;
+}
 
 #nav_standorte{
 	background-size:24px 32px;
