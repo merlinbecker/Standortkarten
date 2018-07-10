@@ -15,8 +15,6 @@ var selectedBranchen=new Array();
 var selectedLaender=new Array();
 var obj_layer_branchen={};
 var obj_branchen={};
-
-var ors_api_key="58d904a497c67e00015b45fc9081c76617cf427fbdfce7099e6038d0";
 /**
 backend communication functions
 **/
@@ -494,7 +492,7 @@ function prepareResults(){
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		remote: {
 		  //url: "http://api.geonames.org/postalCodeSearchJSON?maxRows=10&username=lordmerlo&country=DE",
-		  url:proxy+"?maxRows=10&username=lordmerlo&country=DE",
+		  url:proxy+"?maxRows=10&username="+geonames_api_key+"&country=DE",
 		  transform: function (data) {
 			  $("#searchicon").removeClass("fa-sync-alt fa-spin").addClass("fa-search");
 			console.log(data);
