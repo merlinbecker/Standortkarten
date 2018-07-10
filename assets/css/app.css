@@ -93,10 +93,14 @@ nav.navbar-toggler{
 #umkreis_select_min{
 	display:none;
 }
-#uk_mitte{
+
+#uk_position,#route_start_position,#route_ziel_position{
+	display:none;
+}
+#uk_mitte,#route_start_mitte,#route_ziel_mitte{
 	margin-right:2px;
 }
-#uk_mitte,#uk_position{
+#uk_mitte,#uk_position,#route_start_position,#route_ziel_position,#route_start_mitte,#route_ziel_mitte{
 	float:right;
 }
 
