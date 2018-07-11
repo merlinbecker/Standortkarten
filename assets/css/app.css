@@ -10,6 +10,10 @@ body {
 	padding-top:2px;
 	
 }
+.marker-cluster-large,.marker-cluster-medium,.marker-cluster-small,.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{
+	background-color:orange!important;
+}
+
 nav.navbar{
 	border-top:1px solid black;
 	border-bottom: 1px solid black;
@@ -72,10 +76,10 @@ nav.navbar-toggler{
 	background-color:yellow;
 }
 .icon_3{
-	background-color:DarkOrchid;
+	background-color:FireBrick;
 }
 .icon_4,.icon_8{
-	background-color:MidnightBlue;
+	background-color:navy;
 }
 .icon_5,.icon_6{
 	background-color:LightBlue;

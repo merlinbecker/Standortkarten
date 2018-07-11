@@ -174,7 +174,6 @@ function pinsRecieved(data){
 }
 
 function prepareResults(){
-	
 	groupedOverlays = {
 	  "Länder & Kreise": {
 		"Bundesländer": bundeslaender,
@@ -188,7 +187,6 @@ function prepareResults(){
 	var layerControl = L.control.groupedLayers(baseLayers,groupedOverlays, {
 	  collapsed: isCollapsed
 	});
-	
 	
 	sizeLayerControl();
 	$(window).resize(function() {
@@ -325,10 +323,7 @@ function prepareResults(){
 				 markerClusters.addLayer(theaters);
 				 break;
 				 
-			 } 
-			  
-			  
-			
+			 }
 			syncSidebar();
 		  }
 	  });
@@ -491,7 +486,6 @@ function prepareResults(){
 		},
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		remote: {
-		  //url: "http://api.geonames.org/postalCodeSearchJSON?maxRows=10&username=lordmerlo&country=DE",
 		  url:proxy+"?maxRows=10&username="+geonames_api_key+"&country=DE",
 		  transform: function (data) {
 			  $("#searchicon").removeClass("fa-sync-alt fa-spin").addClass("fa-search");
@@ -1149,7 +1143,6 @@ function syncSidebar() {
     if (map.hasLayer(obj_layer_branchen[1])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_1";
-		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
 		  
         $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
@@ -1159,7 +1152,6 @@ function syncSidebar() {
     if (map.hasLayer(obj_layer_branchen[4])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_4";
-		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
 		  
         $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
@@ -1169,7 +1161,6 @@ function syncSidebar() {
     if (map.hasLayer(obj_layer_branchen[5])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_5";
-		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
 		  
         $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
@@ -1179,7 +1170,6 @@ function syncSidebar() {
     if (map.hasLayer(obj_layer_branchen[2])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_2";
-		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
 		  
         $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
@@ -1189,7 +1179,6 @@ function syncSidebar() {
     if (map.hasLayer(obj_layer_branchen[3])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_3";
-		  if(layer.feature.properties.Art!="HW")css_class="icon_zweitwerk";
 		  
         $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
       }
@@ -1349,389 +1338,92 @@ var markerClusters = new L.MarkerClusterGroup({
   spiderfyOnMaxZoom: true,
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true,
-  disableClusteringAtZoom: 16
+  disableClusteringAtZoom: 11
 });
 
 /* Empty layer placeholder to add to layer control for listening when to add/remove theaters to markerClusters layer */
 //Asphalt
-var zweitwerkIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-var asphaltIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-var recyclingIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-var kiesundSandIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-var natursteinIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-black.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-var transportBetonIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
 var branche_asphalt = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
-	var ic=asphaltIcon;
-	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
-    return L.marker(latlng, {
-      icon:ic,
-      title: feature.properties.id+": "+feature.properties.Name1,
-      riseOnHover: true
-    }).bindTooltip(function (layer) {
-    return layer.feature.properties.Name1;
- },{permanent: true, opacity: 0.9});
-  },
+	return createMarker("yellow","black",feature,latlng)
+},
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
-	  content+="<tr><th>Werk:</th><td>" ;
-		if(feature.properties.Art=="HW")content+="Hauptwerk";
-		else content+="Zweitwerk";
-		content+="</td></tr>";
-	  
-		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
-		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
-		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
-		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
-		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
-		content+=feature.properties.PLZPostfach+"</td></tr>";
-		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
-		content+="<tr><th>Internet:</th><td><a class='url-break' href='http://"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
-		content+="</table>";
       layer.on({
         click: function (e) {
-          $("#feature-title").html(feature.properties.Name1);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+          showStandortInfos(feature);
         }
       });
-      asphaltSearch.push({
-        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
-        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
-        source: "Asphalt",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
+      asphaltSearch.push(addToSearch("Asphalt",feature,layer));
     }
   }
 });
 
-var branche_transportBeton = L.geoJson(null, {
+var branche_recycling = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
-	var ic=transportBetonIcon;
-	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
-    return L.marker(latlng, {
-      icon:ic,
-      title: feature.properties.id+": "+feature.properties.Name1,
-      riseOnHover: true
-    }).bindTooltip(function (layer) {
-    return layer.feature.properties.Name1;
- },{permanent: true, opacity: 0.9});
-  },
+	return createMarker("seagreen","white",feature,latlng)
+},
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
-	  content+="<tr><th>Werk:</th><td>" ;
-		if(feature.properties.Art=="HW")content+="Hauptwerk";
-		else content+="Zweitwerk";
-		content+="</td></tr>";
-	  
-		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
-		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
-		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
-		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
-		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
-		content+=feature.properties.PLZPostfach+"</td></tr>";
-		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
-		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
-		content+="</table>";
       layer.on({
         click: function (e) {
-          $("#feature-title").html(feature.properties.Name1);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+          showStandortInfos(feature);
         }
       });
-      transportBetonSearch.push({
-        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
-        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
-        source: "TransportBeton",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
+      recyclingSearch.push(addToSearch("BaustoffRecycling",feature,layer));
+    }
+  }
+});
+
+var branche_kiesundsand = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	return createMarker("FireBrick","white",feature,latlng)
+},
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      layer.on({
+        click: function (e) {
+          showStandortInfos(feature);
+        }
       });
+      kiesundsandSearch.push(addToSearch("KiesundSand",feature,layer));
     }
   }
 });
 
 var branche_naturstein = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
-	var ic=natursteinIcon;
-	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
-    return L.marker(latlng, {
-      icon:ic,
-      title: feature.properties.id+": "+feature.properties.Name1,
-      riseOnHover: true
-    }).bindTooltip(function (layer) {
-    return layer.feature.properties.Name1;
- },{permanent: true, opacity: 0.9});
-  },
+	return createMarker("navy","white",feature,latlng)
+},
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
-	  content+="<tr><th>Werk:</th><td>" ;
-		if(feature.properties.Art=="HW")content+="Hauptwerk";
-		else content+="Zweitwerk";
-		content+="</td></tr>";
-	  
-		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
-		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
-		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
-		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
-		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
-		content+=feature.properties.PLZPostfach+"</td></tr>";
-		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
-		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
-		content+="</table>";
       layer.on({
         click: function (e) {
-          $("#feature-title").html(feature.properties.Name1);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+          showStandortInfos(feature);
         }
       });
-      natursteinSearch.push({
-        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
-        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
-        source: "Naturstein",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
+      natursteinSearch.push(addToSearch("Naturstein",feature,layer));
     }
   }
 });
 
-
-var branche_kiesundsand = L.geoJson(null, {
+var branche_transportBeton = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
-	var ic=kiesundSandIcon;
-	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
-    return L.marker(latlng, {
-      icon:ic,
-      title: feature.properties.id+": "+feature.properties.Name1,
-      riseOnHover: true
-    }).bindTooltip(function (layer) {
-    return layer.feature.properties.Name1;
- },{permanent: true, opacity: 0.9});
-  },
+	return createMarker("LightBlue","black",feature,latlng)
+},
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
-	  content+="<tr><th>Werk:</th><td>" ;
-		if(feature.properties.Art=="HW")content+="Hauptwerk";
-		else content+="Zweitwerk";
-		content+="</td></tr>";
-	  
-		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
-		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
-		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
-		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
-		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
-		content+=feature.properties.PLZPostfach+"</td></tr>";
-		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
-		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
-		content+="</table>";
       layer.on({
         click: function (e) {
-          $("#feature-title").html(feature.properties.Name1);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+          showStandortInfos(feature);
         }
       });
-      kiesundsandSearch.push({
-        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
-        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
-        source: "KiesundSand",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
+      transportBetonSearch.push(addToSearch("TransportBeton",feature,layer));
     }
   }
 });
 
 
-var branche_recycling = L.geoJson(null, {
-  pointToLayer: function (feature, latlng) {
-	var ic=recyclingIcon;
-	if(feature.properties.Art!="HW")ic=zweitwerkIcon;
-    return L.marker(latlng, {
-      icon:ic,
-      title: feature.properties.id+": "+feature.properties.Name1,
-      riseOnHover: true
-    }).bindTooltip(function (layer) {
-    return layer.feature.properties.Name1;
- },{permanent: true, opacity: 0.9});
-  },
-  onEachFeature: function (feature, layer) {
-    if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 + "</td></tr>";
-	  content+="<tr><th>Werk:</th><td>" ;
-		if(feature.properties.Art=="HW")content+="Hauptwerk";
-		else content+="Zweitwerk";
-		content+="</td></tr>";
-	  
-		content+="<tr><th>Tel:</th><td>" + feature.properties.Telefon + "</td></tr>";
-		content+="<tr><th>Fax:</th><td>" + feature.properties.Telefax + "</td></tr>";
-		content+="<tr><th>Adresse:</th><td>" + feature.properties.Strasse + "<br/>";
-		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
-		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
-		content+=feature.properties.PLZPostfach+"</td></tr>";
-		content+="<tr><th>E-Mail:</th><td>" + feature.properties.Email + "</td></tr>";
-		content+="<tr><th>Internet:</th><td><a class='url-break' href='"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
-		content+="</table>";
-      layer.on({
-        click: function (e) {
-          $("#feature-title").html(feature.properties.Name1);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-        }
-      });
-      recyclingSearch.push({
-        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
-        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
-        source: "BaustoffRecycling",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
-    }
-  }
-});
-
-
-
-
-var theaterLayer = L.geoJson(null);
-var theaters = L.geoJson(null, {
-  pointToLayer: function (feature, latlng) {
-    return L.marker(latlng, {
-      icon: L.icon({
-        iconUrl: "assets/img/theater.png",
-        iconSize: [24, 28],
-        iconAnchor: [12, 28],
-        popupAnchor: [0, -25]
-      }),
-      title: feature.properties.NAME,
-      riseOnHover: true
-    });
-  },
-  onEachFeature: function (feature, layer) {
-    if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADDRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
-      layer.on({
-        click: function (e) {
-          $("#feature-title").html(feature.properties.NAME);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-        }
-      });
-      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/theater.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-      theaterSearch.push({
-        name: layer.feature.properties.NAME,
-        address: layer.feature.properties.ADDRESS1,
-        source: "Theaters",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
-    }
-  }
-});
-
-/* Empty layer placeholder to add to layer control for listening when to add/remove museums to markerClusters layer */
-var museumLayer = L.geoJson(null);
-var museums = L.geoJson(null, {
-  pointToLayer: function (feature, latlng) {
-    return L.marker(latlng, {
-      icon: L.icon({
-        iconUrl: "assets/img/museum.png",
-        iconSize: [24, 28],
-        iconAnchor: [12, 28],
-        popupAnchor: [0, -25]
-      }),
-      title: feature.properties.NAME,
-      riseOnHover: true
-    });
-  },
-  onEachFeature: function (feature, layer) {
-    if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Name</th><td>" + feature.properties.NAME + "</td></tr>" + "<tr><th>Phone</th><td>" + feature.properties.TEL + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADRESS1 + "</td></tr>" + "<tr><th>Website</th><td><a class='url-break' href='" + feature.properties.URL + "' target='_blank'>" + feature.properties.URL + "</a></td></tr>" + "<table>";
-      layer.on({
-        click: function (e) {
-          $("#feature-title").html(feature.properties.NAME);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-          highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-        }
-      });
-      $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="assets/img/museum.png"></td><td class="feature-name">' + layer.feature.properties.NAME + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-      museumSearch.push({
-        name: layer.feature.properties.NAME,
-        address: layer.feature.properties.ADRESS1,
-        source: "Museums",
-        id: L.stamp(layer),
-        lat: layer.feature.geometry.coordinates[1],
-        lng: layer.feature.geometry.coordinates[0]
-      });
-    }
-  }
-});
 
 
 
@@ -1771,18 +1463,19 @@ var locateControl = L.control.locate({
   }
 });
 
-
-
-/*var groupedOverlays = {
-  "Points of Interest": {
-    "<img src='assets/img/theater.png' width='24' height='28'>&nbsp;Theaters": theaterLayer,
-    "<img src='assets/img/museum.png' width='24' height='28'>&nbsp;Museums": museumLayer
-  },
-  "Reference": {
-    "Bundesländer": bundeslaender,
-    "Subway Lines": subwayLines
-  }
-};*/
-
-
-
+function addToSearch(ident,feature,layer){
+	return {
+        name: layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3,
+        address: layer.feature.properties.Strasse+" "+layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort,
+        source: ident,
+        id: L.stamp(layer),
+        lat: layer.feature.geometry.coordinates[1],
+        lng: layer.feature.geometry.coordinates[0]
+      };
+}
+function showStandortInfos(feature){
+	$("#feature-title").html(feature.properties.Name1);
+	$("#feature-info").html(getWerkTabelle(feature));
+	$("#featureModal").modal("show");
+	highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+}
