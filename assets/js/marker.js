@@ -65,6 +65,10 @@ function getWerkTabelle(feature){
 		content+="<tr><th>E-Mail:</th><td><a href='mailto:" + feature.properties.Email + "'" + feature.properties.Email + "</td></tr>";
 		content+="<tr><th>Internet:</th><td><a class='url-break' href='http://"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
 		content+="</table>";
+		content+="<br>";
+		content+="<button type='button' class='btn btn-secondary' id='btn_detail_route_start' data-lat='"+feature.properties.lat+"' data-lng='"+feature.properties.lng+"' data-txt='"+ feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 +"'>Route von hier</button>&nbsp;";
+		content+="<button type='button' class='btn btn-secondary' id='btn_detail_route_ziel' data-lat='"+feature.properties.lat+"' data-lng='"+feature.properties.lng+"' data-txt='"+ feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 +"'>Route hier hin</button>&nbsp;";
+		content+="<button type='button' class='btn btn-secondary' id='btn_detail_umkreis' data-lat='"+feature.properties.lat+"' data-lng='"+feature.properties.lng+"' data-txt='"+ feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 +"'>Umkreissuche</button>";
 	return content;
 }
 function getWerkArt(w){
@@ -88,4 +92,8 @@ function createMarker(markercolor,textcolor,feature,latlng){
 	
 	var marker=new L.Marker.SVGMarker(latlng,{iconOptions: options,riseOnHover:true}).bindTooltip(function (layer) {return '<b>'+getWerkArt(feature.properties.Art)+'</b> von:<br/>'+feature.properties.Name1+' '+feature.properties.Name2+' '+feature.properties.Name3;},{permanent: false, opacity: 0.9});
 	return marker;	
+}
+
+function standortInfos(feature){
+	
 }

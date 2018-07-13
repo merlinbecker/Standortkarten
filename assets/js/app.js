@@ -292,6 +292,7 @@ function prepareResults(){
 	  return false;
 	});
 	
+	
 	L.control.mapCenterCoord({
 		onMove:true
 	}).addTo(map);
@@ -999,6 +1000,68 @@ $(document).ready(function(){
 	return false;
 	});
 	
+	$("#nav_export").click(function(){
+		$(".leaflet-control-container").hide();
+		
+/*
+		var svgElements= $("#map").find('svg');
+		//replace all svgs with a temp canvas
+		svgElements.each(function () {
+			var canvas, xml;
+
+			canvas = document.createElement("canvas");
+			canvas.className = "screenShotTempCanvas";
+			//convert SVG into a XML string
+			
+			xml = (new XMLSerializer()).serializeToString(this);
+			// Removing the name space as IE throws an error
+			xml = xml.replace(/xmlns=\"http:\/\/www\.w3\.org\/2000\/svg\"/, '');
+			
+			
+			canvg(canvas, xml);
+			$(canvas).insertAfter($(this));
+			//hide the SVG element
+			this.className = "tempHide";
+			$(this).hide();
+		});	
+		
+		var test=html2canvas(document.getElementById("map"),{
+            useCORS: true
+        }).then(function(canvas){
+			document.body.appendChild(canvas);
+			var dataUrl    = canvas.toDataURL("image/png");
+			$("#export_image").attr("src",dataUrl);
+			$(".leaflet-control-container").show();
+			$("#exportModal").modal("show");
+			$(".leaflet-overlay-pane").show();
+			
+			$("#map").find('.screenShotTempCanvas').remove();
+			$("#map").find('.tempHide').show().removeClass('tempHide');
+			
+		}).catch(function (error) {
+			console.error('oops, something went wrong!', error);
+			$(".leaflet-control-container").show();
+			$(".leaflet-overlay-pane").show();
+			
+			$("#map").find('.screenShotTempCanvas').remove();
+			$("#map").find('.tempHide').show().removeClass('tempHide');
+		});
+*/
+
+		
+		var test=domtoimage.toPng(document.getElementById("map"),{height:$("#map").height(), width:$("#map").width()}).then(function (dataUrl) {
+			$("#export_image").attr("src",dataUrl);
+			$(".leaflet-control-container").show();
+			$("#exportModal").modal("show");
+		})
+		.catch(function (error) {
+			console.error('oops, something went wrong!', error);
+			$(".leaflet-control-container").show();
+		});
+		
+	});
+	
+	
 	$("#umkreisRadio1").click(function(){
 		$("#umkreis_select_km").show();
 		$("#umkreis_select_min").hide();
@@ -1285,54 +1348,6 @@ var landkreise = L.geoJson(null, {
  }
 );
 
-//Create a color dictionary based off of subway route_id
-var subwayColors = {"1":"#ff3135", "2":"#ff3135", "3":"ff3135", "4":"#009b2e",
-    "5":"#009b2e", "6":"#009b2e", "7":"#ce06cb", "A":"#fd9a00", "C":"#fd9a00",
-    "E":"#fd9a00", "SI":"#fd9a00","H":"#fd9a00", "Air":"#ffff00", "B":"#ffff00",
-    "D":"#ffff00", "F":"#ffff00", "M":"#ffff00", "G":"#9ace00", "FS":"#6e6e6e",
-    "GS":"#6e6e6e", "J":"#976900", "Z":"#976900", "L":"#969696", "N":"#ffff00",
-    "Q":"#ffff00", "R":"#ffff00" };
-
-var subwayLines = L.geoJson(null, {
-  style: function (feature) {
-      return {
-        color: subwayColors[feature.properties.route_id],
-        weight: 3,
-        opacity: 1
-      };
-  },
-  onEachFeature: function (feature, layer) {
-    if (feature.properties) {
-      var content = "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Division</th><td>" + feature.properties.Division + "</td></tr>" + "<tr><th>Line</th><td>" + feature.properties.Line + "</td></tr>" + "<table>";
-      layer.on({
-        click: function (e) {
-          $("#feature-title").html(feature.properties.Line);
-          $("#feature-info").html(content);
-          $("#featureModal").modal("show");
-
-        }
-      });
-    }
-    layer.on({
-      mouseover: function (e) {
-        var layer = e.target;
-        layer.setStyle({
-          weight: 3,
-          color: "#00FFFF",
-          opacity: 1
-        });
-        if (!L.Browser.ie && !L.Browser.opera) {
-          layer.bringToFront();
-        }
-      },
-      mouseout: function (e) {
-        subwayLines.resetStyle(e.target);
-      }
-    });
-  }
-});
-
-
 /* Single marker cluster layer to hold all clusters */
 var markerClusters = new L.MarkerClusterGroup({
   spiderfyOnMaxZoom: true,
@@ -1423,10 +1438,6 @@ var branche_transportBeton = L.geoJson(null, {
   }
 });
 
-
-
-
-
 var zoomControl = L.control.zoom({
   position: "bottomright"
 });
@@ -1473,9 +1484,28 @@ function addToSearch(ident,feature,layer){
         lng: layer.feature.geometry.coordinates[0]
       };
 }
+
 function showStandortInfos(feature){
 	$("#feature-title").html(feature.properties.Name1);
 	$("#feature-info").html(getWerkTabelle(feature));
 	$("#featureModal").modal("show");
 	highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+	$("#btn_detail_route_start").click(function(evt){
+		$("#route_start").val($(this).attr("data-txt"));
+		$("#route_start").attr("data-lat",$(this).attr("data-lat"));
+		$("#route_start").attr("data-lon",$(this).attr("data-lng"));
+		$("#nav_route").click();
+	});
+	$("#btn_detail_route_ziel").click(function(evt){
+		$("#route_ziel").val($(this).attr("data-txt"));
+		$("#route_ziel").attr("data-lat",$(this).attr("data-lat"));
+		$("#route_ziel").attr("data-lon",$(this).attr("data-lng"));
+		$("#nav_route").click();
+	});
+	$("#btn_detail_umkreis").click(function(evt){
+		$("#uks_standort").val($(this).attr("data-txt"));
+		$("#uks_standort").attr("data-lat",$(this).attr("data-lat"));
+		$("#uks_standort").attr("data-lon",$(this).attr("data-lng"));
+		$("#nav_umkreis").click();
+	});
 }

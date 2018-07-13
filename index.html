@@ -59,14 +59,23 @@
 	<!-- Pouch DB -->
 	<!-- https://pouchdb.com/ -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/6.4.3/pouchdb.min.js" integrity="sha256-KCHhiEhNiEbEd8h607QOlmc3LkpQ/En/mS302LGjnLY=" crossorigin="anonymous"></script>
-	
 	<!--Pouchdbcached -->
 	<!-- https://github.com/MazeMap/Leaflet.TileLayer.PouchDBCached -->
 	<script src="https://cdn.jsdelivr.net/npm/leaflet.tilelayer.pouchdbcached@0.3.0/L.TileLayer.PouchDBCached.js" integrity="sha256-OukAutgaviNunFClb2rscLhP0d2aYoKLuJAyPG0CPNE=" crossorigin="anonymous"></script>
 	
+	<!-- CanVG-->
+	<!-- https://github.com/canvg/canvg -->
+	<script src="assets/js/canvg.bundle.js" crossorigin="anonymous"></script>
+	<script src="assets/js/html2canvas.min.js"></script>
+	
 	<!-- Handlebars.js -->
 	<!-- https://github.com/wycats/handlebars.js/ -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
+	
+	<!--- DOM to image -->
+	<!-- https://github.com/tsayen/dom-to-image -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" integrity="sha256-c9vxcXyAG4paArQG3xk6DjyW/9aHxai2ef9RpMWO44A=" crossorigin="anonymous"></script>
+	
 	
 	<!-- custom css+js -->
 	<link rel="stylesheet" href="assets/css/app.css"/>
@@ -76,8 +85,6 @@
 	<script src="assets/js/jsconfig.js"></script>
 	<script src="assets/js/Base64.js"></script>
 	<script src="assets/js/app.js"></script>
-	
-	
 	
 	<link rel="apple-touch-icon" sizes="57x57" href="assets/img/fav/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="assets/img/fav/apple-icon-60x60.png">
@@ -120,6 +127,9 @@
 		  </li>
 		  <li class="nav-item">
 			<a class="nav-link" href="#" id="nav_hilfe">Hilfe/ Tour</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" id="nav_export">Export</a>
 		  </li>
 		</ul>
 		<form class="navbar-form" role="search">
@@ -327,6 +337,37 @@
         <!-- Modal body -->
         <div class="modal-body">
 			<ul class="list-group" id="routen-detail">
+			</ul>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Schließen</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title" id="feature-title">Kartenexport</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body" >
+			<img src="" id="export_image" border="0"/>
+			<ul class="list-group" id="export-detail">
+			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
+			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
+			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
+			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
+			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
 			</ul>
         </div>
         

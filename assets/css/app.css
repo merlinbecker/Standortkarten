@@ -14,6 +14,10 @@ body {
 	background-color:orange!important;
 }
 
+#export_image{
+	max-width:100%;
+}
+
 nav.navbar{
 	border-top:1px solid black;
 	border-bottom: 1px solid black;
@@ -124,6 +128,11 @@ nav.navbar-toggler{
 	background-size:29px 29px;
 	background-position:center 4px;
 	background-image:url(../img/nav/icon_route.png);
+}
+#nav_export{
+	background-size:29px 28px;
+	background-position:center 5px;
+	background-image:url(../img/nav/icon_export.png);
 }
 #nav_hilfe{
 	background-size:29px 29px;
