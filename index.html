@@ -12,6 +12,10 @@
 	<!--jquery-->
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 	
+	<!--- jQuery PrintThis--->
+	<!--https://github.com/jasonday/printThis --> 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.12.3/printThis.min.js" integrity="sha256-Qm7vrIcP+W7FpjQaZH6bCHmD9Xuw2vgsUloqObmIXcA=" crossorigin="anonymous"></script>
+	
 	<!-- fontawesome-->
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 	
@@ -63,10 +67,6 @@
 	<!-- https://github.com/MazeMap/Leaflet.TileLayer.PouchDBCached -->
 	<script src="https://cdn.jsdelivr.net/npm/leaflet.tilelayer.pouchdbcached@0.3.0/L.TileLayer.PouchDBCached.js" integrity="sha256-OukAutgaviNunFClb2rscLhP0d2aYoKLuJAyPG0CPNE=" crossorigin="anonymous"></script>
 	
-	<!-- CanVG-->
-	<!-- https://github.com/canvg/canvg -->
-	<script src="assets/js/canvg.bundle.js" crossorigin="anonymous"></script>
-	<script src="assets/js/html2canvas.min.js"></script>
 	
 	<!-- Handlebars.js -->
 	<!-- https://github.com/wycats/handlebars.js/ -->
@@ -75,7 +75,6 @@
 	<!--- DOM to image -->
 	<!-- https://github.com/tsayen/dom-to-image -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" integrity="sha256-c9vxcXyAG4paArQG3xk6DjyW/9aHxai2ef9RpMWO44A=" crossorigin="anonymous"></script>
-	
 	
 	<!-- custom css+js -->
 	<link rel="stylesheet" href="assets/css/app.css"/>
@@ -355,19 +354,14 @@
       
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title" id="feature-title">Kartenexport</h4>
+          <h4 class="modal-title" id="feature-title">Kartenexport</h4>&nbsp;<button type="button" class="btn btn-primary" id="btn_export_druck" title="Drucken"><i id="searchicon" class="fa fa-print"></i></button>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         
         <!-- Modal body -->
-        <div class="modal-body" >
-			<img src="" id="export_image" border="0"/>
-			<ul class="list-group" id="export-detail">
-			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
-			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
-			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
-			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
-			<li class='list-group-item'>Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:Text1:</li>
+        <div class="modal-body" id="export_content">
+			<img src="" id="export_image" border="0" class="d-print-block"/>
+			<ul class="list-group d-print-table" id="export-detail">
 			</ul>
         </div>
         

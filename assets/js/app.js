@@ -929,7 +929,14 @@ $(document).ready(function(){
 	$("#sidebar").hide();
 	$("#loading").hide();
 	$("#bso_navbar").hide();
-	
+	$("#btn_export_druck").click(function(evt){
+		$("#printSection").remove();
+		$("body").append("<div id='printSection'></div>");
+		$("#printSection").html($("#export_content").html());
+		
+		//$("#printSection").printThis();
+		window.print();
+	});
 	$("#loginform").submit(function(evt){	
 		$("#ladebalken_login").show();
 		var data="{ \"command\": \"login\",\"username\":\""+$('#nutzername').val()+"\",\"passwort\":\""+$('#password').val()+"\"}";
@@ -1002,60 +1009,14 @@ $(document).ready(function(){
 	
 	$("#nav_export").click(function(){
 		$(".leaflet-control-container").hide();
-		
-/*
-		var svgElements= $("#map").find('svg');
-		//replace all svgs with a temp canvas
-		svgElements.each(function () {
-			var canvas, xml;
-
-			canvas = document.createElement("canvas");
-			canvas.className = "screenShotTempCanvas";
-			//convert SVG into a XML string
-			
-			xml = (new XMLSerializer()).serializeToString(this);
-			// Removing the name space as IE throws an error
-			xml = xml.replace(/xmlns=\"http:\/\/www\.w3\.org\/2000\/svg\"/, '');
-			
-			
-			canvg(canvas, xml);
-			$(canvas).insertAfter($(this));
-			//hide the SVG element
-			this.className = "tempHide";
-			$(this).hide();
-		});	
-		
-		var test=html2canvas(document.getElementById("map"),{
-            useCORS: true
-        }).then(function(canvas){
-			document.body.appendChild(canvas);
-			var dataUrl    = canvas.toDataURL("image/png");
-			$("#export_image").attr("src",dataUrl);
-			$(".leaflet-control-container").show();
-			$("#exportModal").modal("show");
-			$(".leaflet-overlay-pane").show();
-			
-			$("#map").find('.screenShotTempCanvas').remove();
-			$("#map").find('.tempHide').show().removeClass('tempHide');
-			
-		}).catch(function (error) {
-			console.error('oops, something went wrong!', error);
-			$(".leaflet-control-container").show();
-			$(".leaflet-overlay-pane").show();
-			
-			$("#map").find('.screenShotTempCanvas').remove();
-			$("#map").find('.tempHide').show().removeClass('tempHide');
-		});
-*/
-
-		
+	
 		var test=domtoimage.toPng(document.getElementById("map"),{height:$("#map").height(), width:$("#map").width()}).then(function (dataUrl) {
 			$("#export_image").attr("src",dataUrl);
 			$(".leaflet-control-container").show();
 			$("#exportModal").modal("show");
 		})
 		.catch(function (error) {
-			console.error('oops, something went wrong!', error);
+			alert("Der Kartenexport ist auf diesem Browser nicht möglich");
 			$(".leaflet-control-container").show();
 		});
 		
@@ -1201,13 +1162,15 @@ function sidebarClick(id) {
 function syncSidebar() {
   /* Empty sidebar features */
   $("#feature-list tbody").empty();
+  $("#export-detail").empty();
   /* Loop through theaters layer and add only features which are in the map bounds */
   branche_asphalt.eachLayer(function (layer) {
     if (map.hasLayer(obj_layer_branchen[1])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_1";
+		  standortInfos(layer,css_class);
 		  
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+ 
       }
     }
   });
@@ -1215,8 +1178,7 @@ function syncSidebar() {
     if (map.hasLayer(obj_layer_branchen[4])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_4";
-		  
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+		  standortInfos(layer,css_class);
       }
     }
   });
@@ -1225,7 +1187,7 @@ function syncSidebar() {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_5";
 		  
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+        standortInfos(layer,css_class);
       }
     }
   });
@@ -1234,7 +1196,7 @@ function syncSidebar() {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_2";
 		  
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+        standortInfos(layer,css_class);
       }
     }
   });
@@ -1242,8 +1204,7 @@ function syncSidebar() {
     if (map.hasLayer(obj_layer_branchen[3])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_3";
-		  
-        $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
+		standortInfos(layer,css_class);
       }
     }
   });

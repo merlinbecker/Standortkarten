@@ -135,6 +135,7 @@ nav.navbar-toggler{
 	background-image:url(../img/nav/icon_export.png);
 }
 #nav_hilfe{
+	display:none;
 	background-size:29px 29px;
 	background-image:url(../img/nav/icon_info.png);
 	background-position: center 4px;
@@ -349,5 +350,30 @@ input[type="radio"], input[type="checkbox"] {
   }
   .leaflet-control-container {
     display: none !important;
+  }
+}
+
+
+@media screen {
+  #printSection {
+      display: none;
+  }
+}
+
+@media print {
+  body * {
+    visibility:hidden;
+  }
+  #printSection, #printSection * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+  @page{
+	  size:A4;
+	  margin:0.4cm;
   }
 }

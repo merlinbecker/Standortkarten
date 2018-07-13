@@ -94,6 +94,14 @@ function createMarker(markercolor,textcolor,feature,latlng){
 	return marker;	
 }
 
-function standortInfos(feature){
+function standortInfos(layer,css_class){
+	$("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;padding:0"><span class="icon_branche_tbl '+css_class+'"></span></td><td class="feature-name">' +layer.feature.properties.id+' '+layer.feature.properties.Name1 +' '+layer.feature.properties.Name2+' '+layer.feature.properties.Name3+'</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
 	
+	var output="<li class='list-group-item'><span class='icon_branche_tbl "+css_class+"'></span>&nbsp;<b>"+layer.feature.properties.id+" ("+getWerkArt(layer.feature.properties.Art)+")</b>:&nbsp;"
+	+layer.feature.properties.Name1+" "+layer.feature.properties.Name2+" "+layer.feature.properties.Name3;
+	output+="<br/>Adresse: " + layer.feature.properties.Strasse + ", ";
+	output+=layer.feature.properties.PLZStrasse+" "+layer.feature.properties.Ort;
+	output+="</li>";
+	
+	$("#export-detail").append($(output));
 }
