@@ -1,8 +1,76 @@
 <?php
-define("CMS_KLASSEN","../");
-require_once("../dbconfig.php");
-require_once('../DB_Verbindung.php');
-$db=new DB_Verbindung("SELECT 1");
+$valid_passwords = array ("admin" => "steinadmin");
+$valid_users = array_keys($valid_passwords);
+
+$user = $_SERVER['PHP_AUTH_USER'];
+$pass = $_SERVER['PHP_AUTH_PW'];
+
+$validated = (in_array($user, $valid_users)) && ($pass == $valid_passwords[$user]);
+
+if (!$validated) {
+  header('WWW-Authenticate: Basic realm="My Realm"');
+  header('HTTP/1.0 401 Unauthorized');
+  die ("Sie haben die falschen Benutzerdaten eingegeben.");
+}
+
+session_start();
+$_SESSION['is_admin']=true;
+
+if(isset($_POST['command'])){
+	define("CMS_KLASSEN","../");
+	require_once("../dbconfig.php");
+	require_once('../DB_Verbindung.php');
+	$db=new DB_Verbindung("SELECT 1");
+	
+	switch($_POST['command']){
+		case "fetchAboData":
+		$ausgabe=array();
+		
+		$ausgabe['bundeslaender']=array();
+		$ausgabe['branchen']=array();
+		
+		$anfrage="SELECT * FROM _sk_bundesland";
+		$db->neueAnfrage($anfrage);
+		if($db->antwort_anzahl>0){
+			do{
+				$ausgabe['bundeslaender'][]=$db->antwort_reihe;
+			}while($db->neueReihe());
+		}
+		
+		$anfrage="SELECT * FROM _sk_branche";
+		$db->neueAnfrage($anfrage);
+		if($db->antwort_anzahl>0){
+			do{
+				$ausgabe['branchen'][]=$db->antwort_reihe;
+			}while($db->neueReihe());
+		}
+		$anfrage="SELECT id,email,anrede,name,firma,anschrift FROM _sk_nutzer ORDER BY name ASC";
+		$db->neueAnfrage($anfrage);
+		if($db->antwort_anzahl>0){
+		$abonnenten=array();
+			do{
+				$db->antwort_reihe['email']=utf8_encode($db->antwort_reihe['email']);
+				$db->antwort_reihe['anrede']=utf8_encode($db->antwort_reihe['anrede']);
+				$db->antwort_reihe['firma']=utf8_encode($db->antwort_reihe['firma']);
+				$db->antwort_reihe['anschrift']=utf8_encode($db->antwort_reihe['anschrift']);
+				
+				$tempdb=new DB_Verbindung("SELECT bundesland,branche FROM _sk_nutzer_bundesland_branche WHERE nutzerid=".$db->antwort_reihe['id']);
+				if($db->antwort_anzahl>0){
+					$db->antwort_reihe['buba_matrix']=$tempdb->antwort_reihe;
+				}
+				$ausgabe['abonnenten'][]=$db->antwort_reihe;
+			}while($db->neueReihe());
+		}
+		echo json_encode($ausgabe);
+		break;
+	}
+
+}
+else include("verwaltung.html");
+exit();
+
+
+
 
 /**POST Aktionen abfragen**/
 if(isset($_POST['action'])){
@@ -67,8 +135,25 @@ mail($empfaenger, $betreff, $nachricht, $header);
 		break;
 	}
 }
+function utf8_encode_deep(&$input) {
+	if (is_string($input)) {
+		$input = utf8_encode($input);
+	} else if (is_array($input)) {
+		foreach ($input as &$value) {
+			utf8_encode_deep($value);
+		}
+		
+		unset($value);
+	} else if (is_object($input)) {
+		$vars = array_keys(get_object_vars($input));
+		
+		foreach ($vars as $var) {
+			utf8_encode_deep($input->$var);
+		}
+	}
+}
 
-/**Hilfsfunktionen**/
+
 function getAboTabelle($uid=0){
 $output="";
 //Schleife durch alle Bundesländer laufen und durch alle Branchen

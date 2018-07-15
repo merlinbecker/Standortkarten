@@ -60,11 +60,13 @@ class DB_Verbindung
 	include($filename);
 	
 	$this->dblink = mysql_connect($host, $nutzer, $passwort);
+	
 	if (!$this->dblink) {
 	$this->fehlermeldung.="Eine Verbindung zur Datenbank konnte nicht hergestellt werden!";
 	echo $this->fehlermeldung;
 	return false;}
    	else{
+		mysql_set_charset('utf8',$this->dblink);
 		$db_selected = mysql_select_db($datenbank, $this->dblink);
 		if (!$db_selected) {
 		$this->fehlermeldung.="Die Datenbank wurde nicht gefunden!";

@@ -380,11 +380,12 @@ mail($empfaenger, $betreff, $nachricht, $header);
 					**/
 					$temp['type']="Feature";
 					$temp['id']=$GLOBALS['db']->antwort_reihe['id'];
-					
+					/*
 					foreach($GLOBALS['db']->antwort_reihe as &$value){
-							$value=utf8_encode($value);
+							if($_SESSION['testversion_suffix']=="_demo")
+								$value=utf8_encode($value);
                 
-					}
+					}*/
 					
 					$GLOBALS['db']->antwort_reihe['type']="Feature";
 					/*$GLOBALS['db']->antwort_reihe['Name1']=utf8_encode($GLOBALS['db']->antwort_reihe['Name1']);	

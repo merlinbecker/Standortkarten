@@ -924,6 +924,7 @@ function prepareResults(){
 }
 
 $(document).ready(function(){
+	$("#loading_export").hide();
 	
 	$("#route_infos").hide();
 	$("#sidebar").hide();
@@ -1009,8 +1010,9 @@ $(document).ready(function(){
 	
 	$("#nav_export").click(function(){
 		$(".leaflet-control-container").hide();
-	
+		$("#loading_export").show();
 		var test=domtoimage.toPng(document.getElementById("map"),{height:$("#map").height(), width:$("#map").width()}).then(function (dataUrl) {
+			$("#loading_export").hide();
 			$("#export_image").attr("src",dataUrl);
 			$(".leaflet-control-container").show();
 			$("#exportModal").modal("show");

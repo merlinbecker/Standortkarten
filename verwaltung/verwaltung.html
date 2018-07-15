@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <title>Verwaltungsbereich BSO- Baustoffe Online</title>
+	
+	<!--jquery-->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	
+	<!-- fontawesome-->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	
+	<!-- Typeahead -->
+	<!-- https://github.com/twitter/typeahead.js/ -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.bundle.min.js" integrity="sha256-VCsWOz+0GuHdS/sIICtQNTFJdbaDI80rxvoB7BXabrU=" crossorigin="anonymous"></script>
+	
+	<!-- include bootstrap -->
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+	
+	<!-- include leaflet -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+   integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+   crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+	integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+	crossorigin=""></script>
+	
+	<!--leaflet plugins: geocontrol -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.62.0/L.Control.Locate.min.css" integrity="sha256-mvCapu8voeqbM31gwIzYjSiq79jiT4LdIEQSmjyRNoE=" crossorigin="anonymous" />
+		<!-- https://github.com/domoritz/leaflet-locatecontrol -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.62.0/L.Control.Locate.min.js" integrity="sha256-mx2qkONLiyGovXkDR+LJKyI7jiw9iuhxCNokVAnNmKs=" crossorigin="anonymous"></script>
+   
+   
+	<!--leaflet plugins: MapCenterCoord -->
+	<!-- https://github.com/xguaita/Leaflet.MapCenterCoord -->
+	<link rel="stylesheet" href="../assets/Leaflet.MapCenterCoord-v0.7/L.Control.MapCenterCoord.min.css" />
+	<script src="../assets/Leaflet.MapCenterCoord-v0.7/L.Control.MapCenterCoord.min.js"></script>
+   
+	<!-- List.js -->
+	<!-- https://github.com/javve/list.js/blob/master/README.md -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js" integrity="sha256-YqOIp4MygNx9/lcWr5lpcR88Ki/MNMWvJJkH0eK+fHM=" crossorigin="anonymous"></script>
+	
+	
+	<!-- Handlebars.js -->
+	<!-- https://github.com/wycats/handlebars.js/ -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
+	
+	
+	<!-- custom css+js -->
+	<link rel="stylesheet" href="verwaltung.css"/>
+	<script src="verwaltung.js"></script>
+	
+	<link rel="apple-touch-icon" sizes="57x57" href="assets/img/fav/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="assets/img/fav/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="assets/img/fav/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="assets/img/fav/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="assets/img/fav/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="assets/img/fav/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="assets/img/fav/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="assets/img/fav/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="assets/img/fav/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="assets/img/fav/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="assets/img/fav/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="assets/img/fav/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="assets/img/fav/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+  </head>
+
+  <body>
+  
+  <!-- Navigation Panel -->
+	<ul class="nav nav-tabs">
+		  <li class="nav-item">
+			<a class="nav-link active" href="#" data-ref="abo">Abonnenten</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" data-ref="standort">Standorte</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link disabled" href="#" data-ref="printwerk">Printwerk</a>
+		  </li>
+		</ul>
+
+	<div id="abo" class="container">
+    </div>
+	<div id="standort" class="container">
+		Standorte
+    </div>
+	<div id="printwerk" class="container">
+		Printwerke
+    </div>
+	
+	  <!-- The Modal -->
+	<div class="modal fade" id="featureModal" tabindex="-1">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+	  
+		<!-- Modal Header -->
+		<div class="modal-header">
+		  <h4 class="modal-title" id="feature-title">Modal Heading</h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+		
+		<!-- Modal body -->
+		<div class="modal-body" id="feature-info">
+		</div>
+		
+		<!-- Modal footer -->
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Schließen</button>
+		</div>
+		
+	  </div>
+	</div>
+	</div>
+	
+  </body>
+</html>
