@@ -1,0 +1,16 @@
+#abo{
+	padding-top:10px;
+}
+#abo_list{
+	padding-top:10px;
+	padding-bottom:10px;
+}
+#abo_new{
+
+}
+th{
+	word-wrap: break-word;
+}
+.modal-lg{
+	max-width:2000px;
+}

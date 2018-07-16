@@ -84,42 +84,98 @@
 			<a class="nav-link" href="#" data-ref="standort">Standorte</a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link disabled" href="#" data-ref="printwerk">Printwerk</a>
+			<a class="nav-link disabled" href="#" data-ref="printwerk" title="Printdaten werden generiert.. Dies kann einige Stunden dauern..">Printwerk <i class="fa fa-sync-alt fa-spin"></i></a>
 		  </li>
 		</ul>
 
 	<div id="abo" class="container">
+		<form class="form-inline">
+		  <input type="search" class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Suchen...">
+
+		  <button type="button" class="btn btn-primary"><i class="fa fa-sort"></i>&nbsp;Firma</button>&nbsp;&nbsp;
+		  <button type="button" class="btn btn-primary"><i class="fa fa-sort"></i>&nbsp;Ansprechpartner</button>
+		</form>
+		<ul class="list-group" id="abo_list">
+		
+		</ul>
     </div>
 	<div id="standort" class="container">
-		Standorte
     </div>
 	<div id="printwerk" class="container">
 		Printwerke
     </div>
 	
 	  <!-- The Modal -->
-	<div class="modal fade" id="featureModal" tabindex="-1">
+	<div class="modal fade" id="newAboModal" tabindex="-1">
 	<div class="modal-dialog">
 	  <div class="modal-content">
-	  
+	  <form class="form-signin" id="newAboModalForm">
 		<!-- Modal Header -->
 		<div class="modal-header">
-		  <h4 class="modal-title" id="feature-title">Modal Heading</h4>
+		  <h4 class="modal-title" id="feature-title">neuer Abonnent</h4>
 		  <button type="button" class="close" data-dismiss="modal">&times;</button>
 		</div>
 		
 		<!-- Modal body -->
-		<div class="modal-body" id="feature-info">
+		<div class="modal-body" id="">
+			
+			<div class="form-group">
+				<label for="abo_email">E-Mail Adresse</label>
+				<input id="abo_email" class="form-control" placeholder="E-Mail" required="" autofocus="" name="email" type="email">
+			</div>
+			<div class="form-group">
+				<label for="abo_firma" >Firma</label>
+				<input id="abo_firma" class="form-control" placeholder="Firma" required="" autofocus="" name="firma" type="text">
+			</div>  
+			<div class="form-group">
+				<label for="abo_anrede">Anrede</label>
+				<select class="form-control" id="abo_anrede" name="anrede">
+				  <option value="Herr" selected="selected">Herr</option>
+				  <option value="Frau">Frau</option>
+				  <option value="Dr.">Dr.</option>
+				</select> 
+			</div>
+			<div class="form-group">
+				<label for="abo_name">Ansprechpartner</label>
+				<input id="abo_name" class="form-control" placeholder="Name des Ansprechpartners" autofocus="" name="name" type="text">
+			</div> 
 		</div>
 		
 		<!-- Modal footer -->
 		<div class="modal-footer">
-		  <button type="button" class="btn btn-primary" data-dismiss="modal">Schließen</button>
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button><button class="btn btn-success" type="submit">Abonnent anlegen</button>
 		</div>
-		
+		</form>
 	  </div>
 	</div>
 	</div>
+	
+	<div class="modal fade" id="aboSettingsModal" tabindex="-1">
+	<div class="modal-dialog modal-lg">
+	  <div class="modal-content">
+	  <form class="form-signin" id="aboSettingsModalForm">
+	  <input type="hidden" id="abochange_uid" name="uid" value="0"/>
+		<!-- Modal Header -->
+		<div class="modal-header">
+		  <h4 class="modal-title" id="feature-title">Branchen-Bundesland-Matrix</h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+		
+		<!-- Modal body -->
+		<div class="modal-body" id="aboSettingsModalMatrix">
+			
+			
+		</div>
+		
+		<!-- Modal footer -->
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button><button class="btn btn-success" type="submit">Speichern</button>
+		</div>
+		</form>
+	  </div>
+	</div>
+	</div>
+	
 	
   </body>
 </html>
