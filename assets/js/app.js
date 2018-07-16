@@ -2,7 +2,7 @@ var url="service.php";
 var proxy="proxy.php";
 
 var myLocation;
-var map, featureList, blSearch = [],lkSearch=[],transportBetonSearch=[],natursteinSearch=[],kiesundsandSearch=[],asphaltSearch=[],recyclingSearch=[],theaterSearch = [], museumSearch = [];
+var map, featureList, blSearch = [],lkSearch=[],transportBetonSearch=[],natursteinSearch=[],kiesundsandSearch=[],asphaltSearch=[],recyclingSearch=[];
 var isCollapsed;
 var baseLayers;
 var groupedOverlays;
@@ -162,8 +162,7 @@ function pinsRecieved(data){
 				case 5:
 				branche_transportBeton.addData(value);
 				break;
-				default:
-				theaters.addData(value);
+				
 			}
 			
 		});
@@ -320,9 +319,7 @@ function prepareResults(){
 				 case 5:
 				 markerClusters.addLayer(branche_transportBeton);
 				 break;
-				 default:
-				 markerClusters.addLayer(theaters);
-				 break;
+				 
 				 
 			 }
 			syncSidebar();
@@ -349,9 +346,7 @@ function prepareResults(){
 				  case 5:
 				 markerClusters.removeLayer(branche_transportBeton);
 				 break;
-				 default:
-				 markerClusters.removeLayer(theaters);
-				 break;
+				
 				 
 			 }
 		syncSidebar();
@@ -460,25 +455,7 @@ function prepareResults(){
 	  });
 	
 	
-	  var theatersBH = new Bloodhound({
-		name: "Theaters",
-		datumTokenizer: function (d) {
-		  return Bloodhound.tokenizers.whitespace(d.name);
-		},
-		queryTokenizer: Bloodhound.tokenizers.whitespace,
-		local: theaterSearch,
-		limit: 10
-	  });
-
-	  var museumsBH = new Bloodhound({
-		name: "Museums",
-		datumTokenizer: function (d) {
-		  return Bloodhound.tokenizers.whitespace(d.name);
-		},
-		queryTokenizer: Bloodhound.tokenizers.whitespace,
-		local: museumSearch,
-		limit: 10
-	  });
+	 
 
 	  var geonamesBH = new Bloodhound({
 		name: "GeoNames",
@@ -521,8 +498,7 @@ function prepareResults(){
 	  natursteinBH.initialize();
 	  recyclingBH.initialize();
 	  kiesundSandBH.initialize();
-	  theatersBH.initialize();
-	  museumsBH.initialize();
+	 
 	  geonamesBH.initialize();
 	  
 	  /* instantiate the typeahead UI */
@@ -643,17 +619,7 @@ function prepareResults(){
 		  }
 		}
 		
-		if (datum.source === "Museums") {
-		  if (!map.hasLayer(museumLayer)) {
-			alert("add layer here!!");
-			map.addLayer(museumLayer);
-		  }
-		  map.setView([datum.lat, datum.lng], 17);
-		  if (map._layers[datum.id]) {
-			  alert("add layer here!!");
-			map._layers[datum.id].fire("click");
-		  }
-		}
+		
 		if (datum.source === "GeoNames") {
 		  map.setView([datum.lat, datum.lng], 14);
 		}
