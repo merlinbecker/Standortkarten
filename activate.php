@@ -1,7 +1,7 @@
 <?php
-define("CMS_KLASSEN","../");
+define("CMS_KLASSEN","");
 require_once("dbconfig.php");
-require_once('klassen/DB_Verbindung.php');
+require_once('DB_Verbindung.php');
 $db=new DB_Verbindung("SELECT 1");
 
 if($_POST['action']=="changePW"){
