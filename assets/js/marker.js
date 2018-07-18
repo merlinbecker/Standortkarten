@@ -62,7 +62,7 @@ function getWerkTabelle(feature){
 		content+=feature.properties.PLZStrasse+" "+feature.properties.Ort+"</td></tr>";
 		content+="<tr><th>Postfach:</th><td>" + feature.properties.Postfach + "<br/>";
 		content+=feature.properties.PLZPostfach+"</td></tr>";
-		content+="<tr><th>E-Mail:</th><td><a href='mailto:" + feature.properties.Email + "'" + feature.properties.Email + "</td></tr>";
+		content+="<tr><th>E-Mail:</th><td><a href='mailto:" + feature.properties.Email + "'>" + feature.properties.Email + "</a></td></tr>";
 		content+="<tr><th>Internet:</th><td><a class='url-break' href='http://"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
 		content+="</table>";
 		content+="<br>";
@@ -90,7 +90,7 @@ function createMarker(markercolor,textcolor,feature,latlng){
 	var options=createMarkerOptions(markercolor,textcolor,feature.properties.Art);
 	options['circleText']=feature.properties.id;
 	
-	var marker=new L.Marker.SVGMarker(latlng,{iconOptions: options,riseOnHover:true}).bindTooltip(function (layer) {return '<b>'+getWerkArt(feature.properties.Art)+'</b> von:<br/>'+feature.properties.Name1+' '+feature.properties.Name2+' '+feature.properties.Name3;},{permanent: false, opacity: 0.9});
+	var marker=new L.Marker.SVGMarker(latlng,{iconOptions: options,riseOnHover:true}).bindTooltip(function (layer) {return '<b>'+getWerkArt(feature.properties.Art)+'</b>:<br/>'+feature.properties.Name1+' '+feature.properties.Name2+' '+feature.properties.Name3;},{permanent: false, opacity: 0.9});
 	return marker;	
 }
 

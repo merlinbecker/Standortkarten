@@ -570,8 +570,42 @@ function prepareResults(){
 		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
 		}
 	  }).on("typeahead:selected", function (obj, datum) {
-		if (datum.source === "Bundesl"||datum.source === "Landkreise") {
-		  map.fitBounds(datum.bounds);
+		if (datum.source === "Bundesl") {
+		 
+			if (!map.hasLayer(bundeslaender)) {
+				map.addLayer(bundeslaender);
+			}
+			landkreise.eachLayer(function(layer) {
+				layer.setStyle(landkreisstyle);
+			});
+			bundeslaender.eachLayer(function(layer) {
+				if(datum.id==L.stamp(layer)){
+					layer.setStyle({
+						color: "blue"
+					});
+					layer.bringToFront();
+				}
+				else layer.setStyle(bundeslandstyle);
+			});
+			map.fitBounds(datum.bounds);
+		}
+		if(datum.source === "Landkreise"){
+			if (!map.hasLayer(landkreise)) {
+				map.addLayer(landkreise);
+			}
+			bundeslaender.eachLayer(function(layer) {
+				layer.setStyle(bundeslandstyle);
+			});
+			landkreise.eachLayer(function(layer) {
+				if(datum.id==L.stamp(layer)){
+					layer.setStyle({
+						color: "blue"
+					});
+					layer.bringToFront();
+				}
+				else layer.setStyle(landkreisstyle);
+			});
+			map.fitBounds(datum.bounds);
 		}
 		if (datum.source === "Asphalt") {
 		  if (!map.hasLayer(obj_layer_branchen[1])) {
@@ -1231,17 +1265,33 @@ var highlightStyle = {
 	});
 
 
-
-
-var bundeslaender = L.geoJson(null, {
-  style: function (feature) {
-    return {
+var bundeslandstyle={
       color: "black",
       fill: false,
       opacity: 1,
       clickable: false
     };
-  },
+var bundeslandstyle_aktiv={
+	color: "blue",
+      fill: false,
+      opacity: 1,
+      clickable: false
+    };
+var landkreisstyle={
+      color: "gray",
+      fill: false,
+      opacity: 1,
+      clickable: false
+    };
+var landkreisstyle_aktiv={
+      color: "blue",
+      fill: false,
+      opacity: 1,
+      clickable: false
+    };
+	
+var bundeslaender = L.geoJson(null, {
+  style:bundeslandstyle,
   onEachFeature: function (feature, layer) {
     blSearch.push({
       name: layer.feature.properties.GEN,
@@ -1256,14 +1306,7 @@ var bundeslaender = L.geoJson(null, {
 );
 
 var landkreise = L.geoJson(null, {
-  style: function (feature) {
-    return {
-      color: "gray",
-      fill: false,
-      opacity: 1,
-      clickable: false
-    };
-  },
+  style:landkreisstyle,
   onEachFeature: function (feature, layer) {
     lkSearch.push({
       name: layer.feature.properties.GEN,

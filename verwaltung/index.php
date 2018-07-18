@@ -23,6 +23,50 @@ if(isset($_POST['command'])){
 	$db=new DB_Verbindung("SELECT 1");
 	
 	switch($_POST['command']){
+		case "fetchStandortData":
+			$suffix=$_POST['suffix'];
+			$tabelle="_sk_standorte".$suffix;
+			$condition="";
+			if(is_numeric($_POST['branche'])&&$_POST['branche']>0){
+				$condition=" WHERE branche=".$_POST['branche'];
+			}
+			if(is_numeric($_POST['bundesland'])&&$_POST['bundesland']>0){
+				if($condition=="")$condition=" WHERE ";
+				else $condition.=" AND ";
+				$condition.="bundesland=".$_POST['bundesland'];
+			}
+			
+			$ausgabe=array();
+		
+			$ausgabe['bundeslaender']=array();
+			$ausgabe['branchen']=array();
+			$ausgabe['standorte']=array();
+			$anfrage="SELECT * FROM _sk_bundesland";
+			$db->neueAnfrage($anfrage);
+			if($db->antwort_anzahl>0){
+				do{
+					$ausgabe['bundeslaender'][]=$db->antwort_reihe;
+				}while($db->neueReihe());
+			}
+			
+			$anfrage="SELECT * FROM _sk_branche";
+			$db->neueAnfrage($anfrage);
+			if($db->antwort_anzahl>0){
+				do{
+					$ausgabe['branchen'][]=$db->antwort_reihe;
+				}while($db->neueReihe());
+			}
+			
+			$anfrage="SELECT * FROM ".$tabelle.$condition;
+			$db->neueAnfrage($anfrage);
+			if($db->antwort_anzahl>0){
+				do{
+					$ausgabe['standorte'][]=$db->antwort_reihe;
+				}while($db->neueReihe());
+			}
+			echo json_encode($ausgabe);
+		break;
+		
 		case "fetchAboData":
 		$ausgabe=array();
 		
@@ -60,6 +104,27 @@ if(isset($_POST['command'])){
 			}while($db->neueReihe());
 		}
 		echo json_encode($ausgabe);
+		break;
+		case "editStandort":
+			if(isset($_POST['id'],$_POST['suffix'])){
+				$ident=$_POST['id'];
+				$suffix=$_POST['suffix'];
+				unset($_POST['id'],$_POST['suffix'],$_POST['command']);
+				$anfrage="UPDATE _sk_standorte".$suffix." SET ";
+				$vars=array();
+				foreach($_POST as $key=>$value){
+					if(!is_numeric($value)){
+						$vars[]=$key."='".mysql_real_escape_string($value)."'";
+					}
+					else $vars[]=$key."=".$value;
+				}
+				$anfrage.=implode(",",$vars);
+				$anfrage.=" WHERE id=".$ident;
+				
+				$db->neueAnfrage($anfrage);
+				
+				echo $db->fehlermeldung."success!";
+			}
 		break;
 	case "createUser":
 			if(isset($_POST['email'])){
@@ -102,6 +167,12 @@ if(isset($_POST['command'])){
 				// verschicke die E-Mail
 				mail($empfaenger, $betreff, $nachricht, $header);
 			echo "success!";
+			}
+		break;
+		case "deleteStandort":
+			if(isset($_POST['datensatz'],$_POST['sid'])){
+				$db->neueAnfrage("DELETE FROM _sk_standorte".$_POST['datensatz']." WHERE id=".$_POST['sid']);
+				echo "success!";
 			}
 		break;
 		case "delete":

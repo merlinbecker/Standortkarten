@@ -55,7 +55,9 @@
 	
 	<!-- custom css+js -->
 	<link rel="stylesheet" href="verwaltung.css"/>
+	<script src="../assets/js/marker.js"></script>
 	<script src="verwaltung.js"></script>
+	
 	
 	<link rel="apple-touch-icon" sizes="57x57" href="assets/img/fav/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="assets/img/fav/apple-icon-60x60.png">
@@ -81,7 +83,7 @@
 			<a class="nav-link active" href="#" data-ref="abo">Abonnenten</a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link disabled" href="#" data-ref="standort">Standorte</a>
+			<a class="nav-link" href="#" data-ref="standort">Standorte</a>
 		  </li>
 		  <li class="nav-item">
 			<a class="nav-link disabled" href="#" data-ref="printwerk" title="Printdaten werden generiert.. Dies kann einige Stunden dauern..">Printwerk <i class="fa fa-sync-alt fa-spin"></i></a>
@@ -105,14 +107,14 @@
 		Printwerke
     </div>
 	
-	  <!-- The Modal -->
+	<!-- The Modal -->
 	<div class="modal fade" id="newAboModal" tabindex="-1">
 	<div class="modal-dialog">
 	  <div class="modal-content">
 	  <form class="form-signin" id="newAboModalForm">
 		<!-- Modal Header -->
 		<div class="modal-header">
-		  <h4 class="modal-title" id="feature-title">neuer Abonnent</h4>
+		  <h4 class="modal-title">neuer Abonnent</h4>
 		  <button type="button" class="close" data-dismiss="modal">&times;</button>
 		</div>
 		
@@ -156,12 +158,39 @@
 	  <input type="hidden" id="abochange_uid" name="uid" value="0"/>
 		<!-- Modal Header -->
 		<div class="modal-header">
-		  <h4 class="modal-title" id="feature-title">Branchen-Bundesland-Matrix</h4>
+		  <h4 class="modal-title">Branchen-Bundesland-Matrix</h4>
 		  <button type="button" class="close" data-dismiss="modal">&times;</button>
 		</div>
 		
 		<!-- Modal body -->
 		<div class="modal-body" id="aboSettingsModalMatrix">
+			
+		</div>
+		
+		<!-- Modal footer -->
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button><button class="btn btn-success" type="submit">Speichern</button>
+		</div>
+		</form>
+	  </div>
+	</div>
+	</div>
+	
+	<!-- The Modal -->
+	<div class="modal fade" id="editStandortModal" tabindex="-1">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+	  <form id="editStandortForm">
+	  <input type="hidden" id="standortedit_sid" name="id" value=""/>
+	  <input type="hidden" id="standortedit_datensatz" name="suffix" value=""/>
+		<!-- Modal Header -->
+		<div class="modal-header">
+		  <h4 class="modal-title">Standort bearbeiten</h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+		
+		<!-- Modal body -->
+		<div class="modal-body" id="editStandortFormBody">
 			
 		</div>
 		

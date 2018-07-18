@@ -1,7 +1,8 @@
-#abo{
+#abo,#standort{
 	padding-top:10px;
 }
-#abo_list{
+
+#abo_list,#standorte_list{
 	padding-top:10px;
 	padding-bottom:10px;
 }
@@ -10,6 +11,12 @@
 }
 th{
 	word-wrap: break-word;
+}
+.standorte_bbdb_auswahl{
+	padding-bottom:15px;
+}
+.standorte_bbdb_auswahl select{
+	margin-left:5px;
 }
 .modal-lg{
 	max-width:2000px;
