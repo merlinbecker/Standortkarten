@@ -41,9 +41,6 @@ $(document).ready(function(evt){
 	});
 	$("#editStandortForm").submit(function(evt){
 		$.post( "#","command=editStandort&"+$(this).serialize(),function(data){
-			console.log("RESPONSE!!");
-			console.log(data);
-			
 			if(data=="success!"){
 				$("#editStandortModal").modal('hide');
 				holeStandorte(currentbranche,currentbundesland,currentdatensatz);
@@ -188,7 +185,7 @@ function holeStandorte(branche,bundesland,datensatz){
 			<span class="standort_tel">${value.Telefon} | ${value.Email} | ${value.Internet}</span>
 			<div class="collapse" id="standortmenu_${value.id}">
 			<br/><button type="button" class="standortedit btn btn-primary" data-ref="${value.id}"><i class="fa fa-edit"></i>&nbsp;Standort bearbeiten</button>&nbsp;
-			<button type="button" class="standortlocate btn btn-primary" data-ref="${value.id}"><i class="fa fa-map-pin"></i>&nbsp;Standort verschieben</button>&nbsp;
+			<!--<button type="button" class="standortlocate btn btn-primary" data-ref="${value.id}"><i class="fa fa-map-pin"></i>&nbsp;Standort verschieben</button>&nbsp;-->
 			<button type="button" class="standortdelete btn btn-danger" data-ref="${value.id}"><i class="fa fa-trash"></i>&nbsp;Entfernen</button>	
 			</div>
 			`;
