@@ -36,13 +36,12 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.62.0/L.Control.Locate.min.css" integrity="sha256-mvCapu8voeqbM31gwIzYjSiq79jiT4LdIEQSmjyRNoE=" crossorigin="anonymous" />
 		<!-- https://github.com/domoritz/leaflet-locatecontrol -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.62.0/L.Control.Locate.min.js" integrity="sha256-mx2qkONLiyGovXkDR+LJKyI7jiw9iuhxCNokVAnNmKs=" crossorigin="anonymous"></script>
-   
-   
+  
 	<!--leaflet plugins: MapCenterCoord -->
 	<!-- https://github.com/xguaita/Leaflet.MapCenterCoord -->
 	<link rel="stylesheet" href="../assets/Leaflet.MapCenterCoord-v0.7/L.Control.MapCenterCoord.min.css" />
 	<script src="../assets/Leaflet.MapCenterCoord-v0.7/L.Control.MapCenterCoord.min.js"></script>
-   
+	
 	<!-- List.js -->
 	<!-- https://github.com/javve/list.js/blob/master/README.md -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js" integrity="sha256-YqOIp4MygNx9/lcWr5lpcR88Ki/MNMWvJJkH0eK+fHM=" crossorigin="anonymous"></script>
@@ -55,6 +54,7 @@
 	
 	<!-- custom css+js -->
 	<link rel="stylesheet" href="verwaltung.css"/>
+	<script src="../assets/js/svg-icon.js"></script>
 	<script src="../assets/js/marker.js"></script>
 	<script src="verwaltung.js"></script>
 	
@@ -191,6 +191,33 @@
 		
 		<!-- Modal body -->
 		<div class="modal-body" id="editStandortFormBody">
+			
+		</div>
+		
+		<!-- Modal footer -->
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button><button class="btn btn-success" type="submit">Speichern</button>
+		</div>
+		</form>
+	  </div>
+	</div>
+	</div>
+	
+	<!-- The Modal -->
+	<div class="modal" id="moveStandortModal" tabindex="-1">
+	<div class="modal-dialog modal-lg">
+	  <div class="modal-content">
+	  <form id="moveStandortModalForm">
+	  <input type="hidden" id="standortmove_sid" name="id" value=""/>
+	  <input type="hidden" id="standortmove_datensatz" name="suffix" value=""/>
+		<!-- Modal Header -->
+		<div class="modal-header">
+		  <h4 class="modal-title">Standort bewegen</h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+		
+		<!-- Modal body -->
+		<div class="modal-body" id="moveStandortFormBody">
 			
 		</div>
 		

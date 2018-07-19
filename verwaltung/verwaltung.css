@@ -21,3 +21,9 @@ th{
 .modal-lg{
 	max-width:2000px;
 }
+#standortmove_map {
+  width: auto;
+  min-height:800px;
+  height: 800px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}

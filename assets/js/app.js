@@ -1098,11 +1098,6 @@ $(document).ready(function(){
 	  return false;
 	});
 	
-	
-	var southWest = L.latLng(43.08506, 3.69489),
-    northEast = L.latLng(59.46638,19.31867),
-    bounds = L.latLngBounds(southWest, northEast);
-	
 	map = L.map("map", {
 	  zoom: 7,
 	  maxZoom:18,
@@ -1221,14 +1216,7 @@ function syncSidebar() {
   $("#features").css("max-height",$("body").height()-$(".navbar").outerHeight()); 
   }
 
-/* Basemap Layers */
-
-var osmde = L.tileLayer("https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> Mitwirkende'
-});
-
-/* Overlay Layers */
+  /* Overlay Layers */
 var highlight = L.geoJson(null);
 var highlightStyle = {
   stroke: false,

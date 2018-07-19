@@ -1,3 +1,10 @@
+var osmde = L.tileLayer("https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> Mitwirkende'
+});
+var southWest = L.latLng(43.08506, 3.69489),northEast = L.latLng(59.46638,19.31867),bounds = L.latLngBounds(southWest, northEast);
+
+
 function createMarkerOptions(markercolor,textcolor,art){
 	if(art=="")art="HW";
 	var options={};
@@ -92,6 +99,31 @@ function createMarker(markercolor,textcolor,feature,latlng){
 	
 	var marker=new L.Marker.SVGMarker(latlng,{iconOptions: options,riseOnHover:true}).bindTooltip(function (layer) {return '<b>'+getWerkArt(feature.properties.Art)+'</b>:<br/>'+feature.properties.Name1+' '+feature.properties.Name2+' '+feature.properties.Name3;},{permanent: false, opacity: 0.9});
 	return marker;	
+}
+
+function getMarkerColorsByBranche(branche){
+	switch(branche){
+		case 1:
+		case 7:
+			return ["yellow","black"];
+		break;
+		case 2:
+		case 9:
+			return ["seagreen","white"];
+		break;
+		case 3:
+			return ["FireBrick","white"];
+		break;
+		case 4:
+		case 8:
+			return ["navy","white"];
+		break;
+		case 5:
+			return ["LightBlue","black"];
+		break;
+		default:
+			return ["LightBlue","black"];
+	}
 }
 
 function standortInfos(layer,css_class){

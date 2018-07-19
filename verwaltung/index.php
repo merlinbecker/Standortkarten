@@ -105,6 +105,14 @@ if(isset($_POST['command'])){
 		}
 		echo json_encode($ausgabe);
 		break;
+		case "changeLocation":
+			if(isset($_POST['id'],$_POST['suffix'])){
+				$anfrage="UPDATE _sk_standorte".$_POST['suffix']." SET lat=".$_POST['lat'].",lng=".$_POST['lon']." WHERE id=".$_POST['id'];
+				$db->neueAnfrage($anfrage);
+				
+				echo $db->fehlermeldung."success!";
+			}
+		break;
 		case "editStandort":
 			if(isset($_POST['id'],$_POST['suffix'])){
 				$ident=$_POST['id'];
