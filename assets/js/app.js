@@ -467,7 +467,7 @@ function prepareResults(){
 		},
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		remote: {
-			url:"https://api.openrouteservice.org/geocode/search?api_key="+ors_api_key+"&lang=de-DE&size=10",
+			url:"https://api.openrouteservice.org/geocode/search?api_key="+ors_api_key+"&lang=de-DE&size=10&boundary.country=DE",
 		  transform: function (data) {
 			return $.map(data.features, function (result) {
 			  return {
