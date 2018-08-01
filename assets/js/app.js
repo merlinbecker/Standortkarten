@@ -8,6 +8,7 @@ var baseLayers;
 var groupedOverlays;
 var layerControl;
 
+var lastzoom=7;
 var testversion=false;
 
 
@@ -166,8 +167,6 @@ function pinsRecieved(data){
 			}
 			
 		});
-		
-		console.log(data.data);
 		prepareResults();
 	}
 }
@@ -181,7 +180,6 @@ function prepareResults(){
 	 "Branchen":obj_branchen
 	};
 	map.addLayer(bundeslaender);
-	
 	
 	var layerControl = L.control.groupedLayers(baseLayers,groupedOverlays, {
 	  collapsed: isCollapsed
@@ -252,7 +250,6 @@ function prepareResults(){
 			$("#route_infos").show();
 			$("#route_statistik").html(Number(data.features[0].properties.segments[0].distance/1000).toFixed(2) + " km<br>"+hours+" Stunden, "+mins+" Minuten");
 			$("#routen-detail").html("");
-			
 			$.each(data.features[0].properties.segments[0].steps,function(index,value){
 				var km=Number(value.distance/1000).toFixed(2);
 				var txt="<b>Nach "+km+" km:</b> "+value.instruction;
@@ -360,9 +357,14 @@ function prepareResults(){
 
 	/* Clear feature highlight when map is clicked */
 	map.on("click", function(e) {
-	  highlight.clearLayers();
+		highlight.clearLayers();
 	});
 	
+	map.on("zoomend",function(e){
+		if(map.getZoom()!=17){
+			lastzoom=map.getZoom();
+		}
+	});
 	zoomControl.addTo(map);
 	locateControl.addTo(map);
 	layerControl.addTo(map);
@@ -457,6 +459,34 @@ function prepareResults(){
 	
 	 
 
+	  var reverseGeoCodeBH = new Bloodhound({
+		name: "OpenRouteService",
+		limit:10,
+		datumTokenizer: function (d) {
+		  return Bloodhound.tokenizers.whitespace(d.name);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		remote: {
+			url:"https://api.openrouteservice.org/geocode/search?api_key="+ors_api_key+"&lang=de-DE&size=10",
+		  transform: function (data) {
+			return $.map(data.features, function (result) {
+			  return {
+				name: result.properties.label,
+				lat: result.geometry.coordinates[1],
+				lng: result.geometry.coordinates[0],
+				source: "OpenRouteService"
+			  };
+			});
+		  },
+		  prepare: function (query, settings){
+			settings.url+="&text="+encodeURIComponent(query);
+			let mitte=L.latLng(map.getCenter());
+			settings.url+="&focus.point.lat="+mitte.lat+"&focus.point.lon="+mitte.lng;
+            return settings;
+           },
+		},
+	  });
+	  
 	  var geonamesBH = new Bloodhound({
 		name: "GeoNames",
 		datumTokenizer: function (d) {
@@ -467,7 +497,6 @@ function prepareResults(){
 		  url:proxy+"?maxRows=10&username="+geonames_api_key+"&country=DE",
 		  transform: function (data) {
 			  $("#searchicon").removeClass("fa-sync-alt fa-spin").addClass("fa-search");
-			console.log(data);
 			return $.map(data.postalCodes, function (result) {
 			  return {
 				name: result.postalCode+" "+result.placeName + ", " + result.adminCode1,
@@ -500,6 +529,7 @@ function prepareResults(){
 	  kiesundSandBH.initialize();
 	 
 	  geonamesBH.initialize();
+	  reverseGeoCodeBH.initialize();
 	  
 	  /* instantiate the typeahead UI */
 	  $("#searchbox").typeahead({
@@ -676,7 +706,24 @@ function prepareResults(){
 		minLength: 3,
 		highlight: true,
 		hint: false
-	  }, {
+	  },
+	{
+		name: "OpenRouteService",
+		displayKey: "name",
+		source: reverseGeoCodeBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Adressen</h4>"
+		}
+	  },
+	{
+		name: "GeoNames",
+		displayKey: "name",
+		source: geonamesBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
+		}
+	  },
+	  {
 		name: "Bundesl",
 		displayKey: "name",
 		source: bundeslaenderBH.ttAdapter(),
@@ -730,14 +777,6 @@ function prepareResults(){
 		source: kiesundSandBH.ttAdapter(),
 		templates: {
 		  header: "<h4 class='typeahead-header'>Kies und Sand</h4>"
-		}
-	  }, 
-	   {
-		name: "GeoNames",
-		displayKey: "name",
-		source: geonamesBH.ttAdapter(),
-		templates: {
-		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
 		}
 	  }).on("typeahead:selected", function (obj, datum) {
 		if (datum.source === "Bundesl"||datum.source === "Landkreise") {
@@ -749,11 +788,24 @@ function prepareResults(){
 		  $("#uks_standort").attr("data-lon",datum.lng);
 		}
 	  });
-	  
 	  $("#route_start").typeahead({
 		minLength: 3,
 		highlight: true,
 		hint: false
+	  },{
+		name: "OpenRouteService",
+		displayKey: "name",
+		source: reverseGeoCodeBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Adressen</h4>"
+		}
+	  },{
+		name: "GeoNames",
+		displayKey: "name",
+		source: geonamesBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
+		}
 	  }, {
 		name: "Bundesl",
 		displayKey: "name",
@@ -808,14 +860,6 @@ function prepareResults(){
 		source: kiesundSandBH.ttAdapter(),
 		templates: {
 		  header: "<h4 class='typeahead-header'>Kies und Sand</h4>"
-		}
-	  }, 
-	   {
-		name: "GeoNames",
-		displayKey: "name",
-		source: geonamesBH.ttAdapter(),
-		templates: {
-		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
 		}
 	  }).on("typeahead:selected", function (obj, datum) {
 		if (datum.source === "Bundesl"||datum.source === "Landkreise") {
@@ -833,6 +877,20 @@ function prepareResults(){
 		highlight: true,
 		hint: false
 	  }, {
+		name: "OpenRouteService",
+		displayKey: "name",
+		source: reverseGeoCodeBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Adressen</h4>"
+		}
+	  },{
+		name: "GeoNames",
+		displayKey: "name",
+		source: geonamesBH.ttAdapter(),
+		templates: {
+		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
+		}
+	  },{
 		name: "Bundesl",
 		displayKey: "name",
 		source: bundeslaenderBH.ttAdapter(),
@@ -886,14 +944,6 @@ function prepareResults(){
 		source: kiesundSandBH.ttAdapter(),
 		templates: {
 		  header: "<h4 class='typeahead-header'>Kies und Sand</h4>"
-		}
-	  }, 
-	   {
-		name: "GeoNames",
-		displayKey: "name",
-		source: geonamesBH.ttAdapter(),
-		templates: {
-		  header: "<h4 class='typeahead-header'><img src='assets/img/globe.png' width='25' height='25'>&nbsp;Orte</h4>"
 		}
 	  }).on("typeahead:selected", function (obj, datum) {
 		if (datum.source === "Bundesl"||datum.source === "Landkreise") {
@@ -925,7 +975,10 @@ function prepareResults(){
 
 $(document).ready(function(){
 	$("#loading_export").hide();
-	
+	$("#feature_zoom_back").hide();
+	$("#feature_zoom_back").click(function(evt){
+		map.setZoom(lastzoom);
+	});
 	$("#route_infos").hide();
 	$("#sidebar").hide();
 	$("#loading").hide();
@@ -947,6 +1000,7 @@ $(document).ready(function(){
 		return false;
 	});
 	
+	$("#legende_content").html(createLegende());
 	
 	$("#testaccount").click(function(evt){
 		$("#nutzername").val("test@test.de");
@@ -965,7 +1019,10 @@ $(document).ready(function(){
 			}
 	});
 	
-	
+	$("#btn_sidebar_enable").click(function(evt){
+		$("#btn_sidebar_enable").hide();
+		animateSidebar();
+	});
 	
 	
 	checkLogin();
@@ -1008,6 +1065,10 @@ $(document).ready(function(){
 	return false;
 	});
 	
+	$("#nav_legende").click(function(evt){
+		$("#legendeModal").modal("show");
+	});
+	
 	$("#nav_export").click(function(){
 		$(".leaflet-control-container").hide();
 		$("#loading_export").show();
@@ -1037,11 +1098,18 @@ $(document).ready(function(){
 	$("#route_start").val("");
 	$("#route_ziel").val("");
 	
+	$("#route_start,#route_ziel").change(function(evt){
+		$("#route_infos").hide();
+		l_route.clearLayers();
+	});
+	
+	$("#uks_standort,#umkreis_select_km,#umkreis_select_min,input[name=uks_range_type]").change(function(evt){
+		l_umkreis.clearLayers();
+	});
 	$("#route_swap").click(function(evt){
 		var tmp_name=$("#route_start").val();
 		var tmp_lat=$("#route_start").attr("data-lat");
 		var tmp_lon=$("#route_start").attr("data-lon");
-		console.log(tmp_name);
 		
 		$("#route_start").val($("#route_ziel").val());
 		$("#route_start").attr("data-lat",$("#route_ziel").attr("data-lat"));
@@ -1124,15 +1192,19 @@ function onLocationError(e){
 function onLocationFound(e) {
 	$("#uk_position,#route_start_position,#route_ziel_position").show();
     myLocation=L.latLng(e.latlng);
-	console.log("Location updated!");
-	console.log(e.latlng);
 }
 
 function animateSidebar() {
-	  $("#sidebar").animate({
+	$("#btn_sidebar_enable").hide();	 
+	 $("#sidebar").animate({
 		width: "toggle"
 	  }, 350, function() {
 		map.invalidateSize();
+		console.log("Toggle finished!");
+		if($("#sidebar").is(":hidden")){
+			$("#btn_sidebar_enable").show();
+		}
+		else $("#btn_sidebar_enable").hide();
 	  });
 }
 	
@@ -1220,7 +1292,7 @@ function syncSidebar() {
 var highlight = L.geoJson(null);
 var highlightStyle = {
   stroke: false,
-  fillColor: "#000000",
+  fillColor: "#FF0000",
   fillOpacity: 0.7,
   radius: 10
 };
@@ -1320,7 +1392,7 @@ var markerClusters = new L.MarkerClusterGroup({
 //Asphalt
 var branche_asphalt = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
-	return createMarker("yellow","black",feature,latlng)
+	return createMarker("yellow","black",feature,latlng);
 },
   onEachFeature: function (feature, layer) {
     if (feature.properties) {
@@ -1448,6 +1520,12 @@ function addToSearch(ident,feature,layer){
 function showStandortInfos(feature){
 	$("#feature-title").html(feature.properties.Name1);
 	$("#feature-info").html(getWerkTabelle(feature));
+	if(lastzoom<map.getZoom()){
+		$("#feature_zoom_back").show();
+	}
+	else{
+		$("#feature_zoom_back").hide();
+	}
 	$("#featureModal").modal("show");
 	highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
 	$("#btn_detail_route_start").click(function(evt){
@@ -1455,17 +1533,20 @@ function showStandortInfos(feature){
 		$("#route_start").attr("data-lat",$(this).attr("data-lat"));
 		$("#route_start").attr("data-lon",$(this).attr("data-lng"));
 		$("#nav_route").click();
+		$("#featureModal").modal("hide");
 	});
 	$("#btn_detail_route_ziel").click(function(evt){
 		$("#route_ziel").val($(this).attr("data-txt"));
 		$("#route_ziel").attr("data-lat",$(this).attr("data-lat"));
 		$("#route_ziel").attr("data-lon",$(this).attr("data-lng"));
 		$("#nav_route").click();
+		$("#featureModal").modal("hide");
 	});
 	$("#btn_detail_umkreis").click(function(evt){
 		$("#uks_standort").val($(this).attr("data-txt"));
 		$("#uks_standort").attr("data-lat",$(this).attr("data-lat"));
 		$("#uks_standort").attr("data-lon",$(this).attr("data-lng"));
 		$("#nav_umkreis").click();
+		$("#featureModal").modal("hide");
 	});
 }

@@ -130,6 +130,9 @@
 		  <li class="nav-item">
 			<a class="nav-link" href="#" id="nav_export">Export</a>
 		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" id="nav_legende">Legende</a>
+		  </li>
 		</ul>
 		<form class="navbar-form" role="search">
 			<div class="input-group">
@@ -243,6 +246,7 @@
 		</div>
 		
 	  </div>
+	  <button type="button" id="btn_sidebar_enable" class="btn btn-light"><i class="fa fa-chevron-right"></i></button>
 	  <div id="map"></div>
     </div>
 	<!-- Loading Screen -->
@@ -323,6 +327,7 @@
         
         <!-- Modal footer -->
         <div class="modal-footer">
+		<button type="button" class="btn btn-info" id="feature_zoom_back">Zoom zurück</button>
           <button type="button" class="btn btn-primary" data-dismiss="modal">Schließen</button>
         </div>
         
@@ -361,7 +366,7 @@
       
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title" id="feature-title">Kartenexport</h4>&nbsp;<button type="button" class="btn btn-primary" id="btn_export_druck" title="Drucken"><i id="searchicon" class="fa fa-print"></i></button>
+          <h4 class="modal-title">Kartenexport</h4>&nbsp;<button type="button" class="btn btn-primary" id="btn_export_druck" title="Drucken"><i id="searchicon" class="fa fa-print"></i></button>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         
@@ -370,6 +375,29 @@
 			<img src="" id="export_image" border="0" class="d-print-block"/>
 			<ul class="list-group d-print-table" id="export-detail">
 			</ul>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Schließen</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="legendeModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Legende</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body" id="legende_content">
         </div>
         
         <!-- Modal footer -->

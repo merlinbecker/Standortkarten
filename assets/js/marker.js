@@ -71,6 +71,7 @@ function getWerkTabelle(feature){
 		content+=feature.properties.PLZPostfach+"</td></tr>";
 		content+="<tr><th>E-Mail:</th><td><a href='mailto:" + feature.properties.Email + "'>" + feature.properties.Email + "</a></td></tr>";
 		content+="<tr><th>Internet:</th><td><a class='url-break' href='http://"+ feature.properties.Internet +"' target='_blank'>"+ feature.properties.Internet+ "</td></tr>";
+		content+="<tr><th>Sonstiges:</th><td>"+ feature.properties.SonstigeAngaben+ "</td></tr>";
 		content+="</table>";
 		content+="<br>";
 		content+="<button type='button' class='btn btn-secondary' id='btn_detail_route_start' data-lat='"+feature.properties.lat+"' data-lng='"+feature.properties.lng+"' data-txt='"+ feature.properties.Name1+" "+feature.properties.Name2+" "+feature.properties.Name3 +"'>Route von hier</button>&nbsp;";
@@ -91,6 +92,46 @@ function getWerkArt(w){
 			return "Gebietshauptwerk";
 			
 	}
+}
+
+function createLegendeItem(branche,werk){
+	let farben=getMarkerColorsByBranche(branche);
+	let features={
+		properties:{
+			Art: werk,
+			Name1: "Name",
+			Name2: "Name",
+			Name3: "Name",
+			id:werk
+		}
+	};
+	let m=createMarker(farben[0],farben[1],features,L.latLng(0.0,0.0));
+	return m.options.icon.options.html;
+}
+function createLegende(){
+	var hauptwerke="";
+	for(let i=1;i<=5;i++){
+		hauptwerke+=createLegendeItem(i,"HW");
+	}
+	var zweigwerke="";
+	for(let i=1;i<=5;i++){
+		zweigwerke+=createLegendeItem(i,"ZW");
+	}
+	var hzw="";
+	for(let i=1;i<=5;i++){
+		hzw+=createLegendeItem(i,"HZW");
+	}
+	var ghw="";
+	for(let i=1;i<=5;i++){
+		ghw+=createLegendeItem(i,"GH");
+	}
+	
+	return `
+		<h4>Hauptwerk (HW)</h4>${hauptwerke}<br/>Farbe wie Branche
+		<h4>Zweigwerk (ZW)</h4>${zweigwerke}<br/>Grau mit Punkt in Farbe wie Branche
+		<h4>Hauptwerk + Zweigwerk (HZW)</h4>${hzw}<br/>Farbe wie Branche mit Punkt in Grau
+		<h4>Gebietshauptwerk (GH)</h4>${ghw}<br/>Grau mit Rand (fett) in Farbe wie Branche
+	`
 }
 
 function createMarker(markercolor,textcolor,feature,latlng){

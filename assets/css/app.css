@@ -18,6 +18,15 @@ body {
 	max-width:100%;
 }
 
+#btn_sidebar_enable{
+	display:none;
+	position:absolute;
+	left:-5px;
+	top:65px;
+	z-index:9999;
+	border:1px black solid;
+}
+
 nav.navbar{
 	border-top:1px solid black;
 	border-bottom: 1px solid black;
@@ -128,6 +137,11 @@ nav.navbar-toggler{
 	background-size:29px 29px;
 	background-position:center 4px;
 	background-image:url(../img/nav/icon_route.png);
+}
+#nav_legende{
+	background-size:29px 29px;
+	background-position:center 6px;
+	background-image:url(../img/nav/icon_info.png);
 }
 #nav_export{
 	background-size:29px 28px;
