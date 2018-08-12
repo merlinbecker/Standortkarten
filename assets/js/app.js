@@ -1098,13 +1098,26 @@ $(document).ready(function(){
 	$("#route_start").val("");
 	$("#route_ziel").val("");
 	
+	$("#route_start,#route_ziel").focus(function(evt){
+		$("#route_infos").hide();
+		l_route.clearLayers();
+		l_umkreis.clearLayers();
+	});
+	
+	$("#uks_standort,#umkreis_select_km,#umkreis_select_min,input[name=uks_range_type]").focus(function(evt){
+		l_umkreis.clearLayers();
+		l_route.clearLayers();
+	});
+	
 	$("#route_start,#route_ziel").change(function(evt){
 		$("#route_infos").hide();
 		l_route.clearLayers();
+		l_umkreis.clearLayers();
 	});
 	
 	$("#uks_standort,#umkreis_select_km,#umkreis_select_min,input[name=uks_range_type]").change(function(evt){
 		l_umkreis.clearLayers();
+		l_route.clearLayers();
 	});
 	$("#route_swap").click(function(evt){
 		var tmp_name=$("#route_start").val();
