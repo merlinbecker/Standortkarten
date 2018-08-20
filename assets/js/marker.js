@@ -160,6 +160,7 @@ function getMarkerColorsByBranche(branche){
 			return ["navy","white"];
 		break;
 		case 5:
+		case 6:
 			return ["LightBlue","black"];
 		break;
 		default:

@@ -163,6 +163,18 @@ function pinsRecieved(data){
 				case 5:
 				branche_transportBeton.addData(value);
 				break;
+				case 6:
+				branche_transportBeton2016.addData(value);
+				break;
+				case 7:
+				branche_asphalt2017.addData(value);
+				break;
+				case 8:
+				branche_naturstein2017.addData(value);
+				break;
+				case 9:
+				branche_recycling2019.addData(value);
+				break;
 				
 			}
 			
@@ -298,6 +310,7 @@ function prepareResults(){
 
 	/* Layer control listeners that allow for a single markerClusters layer */
 	map.on("overlayadd", function(e) {
+		landkreise.bringToBack();
 	  $.each(obj_layer_branchen, function( index, value ){
 		  if(e.layer==value){
 			 switch(parseInt(index)){
@@ -316,8 +329,18 @@ function prepareResults(){
 				 case 5:
 				 markerClusters.addLayer(branche_transportBeton);
 				 break;
-				 
-				 
+				 case 6:
+				markerClusters.addLayer(branche_transportBeton2016);
+				break;
+				case 7:
+				markerClusters.addLayer(branche_asphalt2017);
+				break;
+				case 8:
+				markerClusters.addLayer(branche_naturstein2017);
+				break;
+				case 9:
+				markerClusters.addLayer(branche_recycling2018);
+				break;
 			 }
 			syncSidebar();
 		  }
@@ -343,6 +366,18 @@ function prepareResults(){
 				  case 5:
 				 markerClusters.removeLayer(branche_transportBeton);
 				 break;
+				  case 6:
+				markerClusters.removeLayer(branche_transportBeton2016);
+				break;
+				case 7:
+				markerClusters.removeLayer(branche_asphalt2017);
+				break;
+				case 8:
+				markerClusters.removeLayer(branche_naturstein2017);
+				break;
+				case 9:
+				markerClusters.removeLayer(branche_recycling2018);
+				break;
 				
 				 
 			 }
@@ -622,6 +657,7 @@ function prepareResults(){
 		if(datum.source === "Landkreise"){
 			if (!map.hasLayer(landkreise)) {
 				map.addLayer(landkreise);
+				landkreise.bringToBack();
 			}
 			bundeslaender.eachLayer(function(layer) {
 				layer.setStyle(bundeslandstyle);
@@ -638,26 +674,49 @@ function prepareResults(){
 			map.fitBounds(datum.bounds);
 		}
 		if (datum.source === "Asphalt") {
-		  if (!map.hasLayer(obj_layer_branchen[1])) {
-			map.addLayer(obj_layer_branchen[1]);
+		  if(obj_layer_branchen[1]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[1])) {
+				map.addLayer(obj_layer_branchen[1]);
+			  }
 		  }
+		  if(obj_layer_branchen[7]!=undefined){
+			 if (!map.hasLayer(obj_layer_branchen[7])) {
+				map.addLayer(obj_layer_branchen[7]);
+			  } 
+		  }
+		  
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
 			map._layers[datum.id].fire("click");
 		  }
 		}
 		if (datum.source === "Naturstein") {
-		  if (!map.hasLayer(obj_layer_branchen[4])) {
-			map.addLayer(obj_layer_branchen[4]);
+		  if(obj_layer_branchen[4]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[4])) {
+				map.addLayer(obj_layer_branchen[4]);
+			  }
 		  }
+		  if(obj_layer_branchen[8]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[8])) {
+				map.addLayer(obj_layer_branchen[8]);
+			  }
+		  }
+		  
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
 			map._layers[datum.id].fire("click");
 		  }
 		}
 		if (datum.source === "TransportBeton") {
-		  if (!map.hasLayer(obj_layer_branchen[5])) {
-			map.addLayer(obj_layer_branchen[5]);
+		  if(obj_layer_branchen[5]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[5])) {
+				map.addLayer(obj_layer_branchen[5]);
+			  }
+		  }
+		  if(obj_layer_branchen[6]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[6])) {
+				map.addLayer(obj_layer_branchen[6]);
+			  }
 		  }
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
@@ -665,9 +724,17 @@ function prepareResults(){
 		  }
 		}
 		if (datum.source === "BaustoffRecycling") {
-		  if (!map.hasLayer(obj_layer_branchen[2])) {
-			map.addLayer(obj_layer_branchen[2]);
+		  if(obj_layer_branchen[2]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[2])) {
+				map.addLayer(obj_layer_branchen[2]);
+			  }
 		  }
+		  if(obj_layer_branchen[9]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[9])) {
+				map.addLayer(obj_layer_branchen[9]);
+			  }
+		  }
+		  
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
 			map._layers[datum.id].fire("click");
@@ -1251,13 +1318,29 @@ function syncSidebar() {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_1";
 		  standortInfos(layer,css_class);
-		  
- 
       }
     }
   });
+  
+  branche_asphalt2017.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[7])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_1";
+		  standortInfos(layer,css_class);
+      }
+    }
+  });
+  
   branche_naturstein.eachLayer(function (layer) {
     if (map.hasLayer(obj_layer_branchen[4])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_4";
+		  standortInfos(layer,css_class);
+      }
+    }
+  });
+   branche_naturstein2017.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[8])) {
       if (map.getBounds().contains(layer.getLatLng())) {
 		  var css_class="icon_4";
 		  standortInfos(layer,css_class);
@@ -1273,6 +1356,16 @@ function syncSidebar() {
       }
     }
   });
+  branche_transportBeton2016.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[6])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_5";
+		  
+        standortInfos(layer,css_class);
+      }
+    }
+  });
+  
   branche_recycling.eachLayer(function (layer) {
     if (map.hasLayer(obj_layer_branchen[2])) {
       if (map.getBounds().contains(layer.getLatLng())) {
@@ -1282,6 +1375,16 @@ function syncSidebar() {
       }
     }
   });
+  branche_recycling2018.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[9])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_2";
+		  
+        standortInfos(layer,css_class);
+      }
+    }
+  });
+  
    branche_kiesundsand.eachLayer(function (layer) {
     if (map.hasLayer(obj_layer_branchen[3])) {
       if (map.getBounds().contains(layer.getLatLng())) {
@@ -1419,7 +1522,40 @@ var branche_asphalt = L.geoJson(null, {
   }
 });
 
+var branche_asphalt2017 = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	return createMarker("yellow","black",feature,latlng);
+},
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      layer.on({
+        click: function (e) {
+          showStandortInfos(feature);
+        }
+      });
+      asphaltSearch.push(addToSearch("Asphalt",feature,layer));
+    }
+  }
+});
+
+
 var branche_recycling = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	return createMarker("seagreen","white",feature,latlng)
+},
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      layer.on({
+        click: function (e) {
+          showStandortInfos(feature);
+        }
+      });
+      recyclingSearch.push(addToSearch("BaustoffRecycling",feature,layer));
+    }
+  }
+});
+
+var branche_recycling2018 = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
 	return createMarker("seagreen","white",feature,latlng)
 },
@@ -1467,7 +1603,39 @@ var branche_naturstein = L.geoJson(null, {
   }
 });
 
+var branche_naturstein2017 = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	return createMarker("navy","white",feature,latlng)
+},
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      layer.on({
+        click: function (e) {
+          showStandortInfos(feature);
+        }
+      });
+      natursteinSearch.push(addToSearch("Naturstein",feature,layer));
+    }
+  }
+});
+
 var branche_transportBeton = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	return createMarker("LightBlue","black",feature,latlng)
+},
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      layer.on({
+        click: function (e) {
+          showStandortInfos(feature);
+        }
+      });
+      transportBetonSearch.push(addToSearch("TransportBeton",feature,layer));
+    }
+  }
+});
+
+var branche_transportBeton2016 = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
 	return createMarker("LightBlue","black",feature,latlng)
 },
