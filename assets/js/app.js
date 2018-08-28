@@ -173,7 +173,7 @@ function pinsRecieved(data){
 				branche_naturstein2017.addData(value);
 				break;
 				case 9:
-				branche_recycling2019.addData(value);
+				branche_recycling2018.addData(value);
 				break;
 				
 			}
