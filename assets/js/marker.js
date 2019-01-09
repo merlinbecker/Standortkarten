@@ -126,12 +126,7 @@ function createLegende(){
 		ghw+=createLegendeItem(i,"GH");
 	}
 	
-	return `
-		<h4>Hauptwerk (HW)</h4>${hauptwerke}<br/>Farbe wie Branche
-		<h4>Zweigwerk (ZW)</h4>${zweigwerke}<br/>Grau mit Punkt in Farbe wie Branche
-		<h4>Hauptwerk + Zweigwerk (HZW)</h4>${hzw}<br/>Farbe wie Branche mit Punkt in Grau
-		<h4>Gebietshauptwerk (GH)</h4>${ghw}<br/>Grau mit Rand (fett) in Farbe wie Branche
-	`
+	return "<h4>Hauptwerk (HW)</h4>"+hauptwerke+"<br/>Farbe wie Branche<h4>Zweigwerk (ZW)</h4>"+zweigwerke+"<br/>Grau mit Punkt in Farbe wie Branche<h4>Hauptwerk + Zweigwerk (HZW)</h4>"+hzw+"<br/>Farbe wie Branche mit Punkt in Grau<h4>Gebietshauptwerk (GH)</h4>"+ghw+"<br/>Grau mit Rand (fett) in Farbe wie Branche";
 }
 
 function createMarker(markercolor,textcolor,feature,latlng){
@@ -160,6 +155,7 @@ function getMarkerColorsByBranche(branche){
 			return ["navy","white"];
 		break;
 		case 5:
+		case 6:
 			return ["LightBlue","black"];
 		break;
 		default:

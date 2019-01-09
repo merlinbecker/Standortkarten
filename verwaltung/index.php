@@ -1,5 +1,6 @@
 <?php
-$valid_passwords = array ("admin" => "steinadmin");
+require_once("../dbconfig.php");
+$valid_passwords = array ($nutzer_verwaltung => $pw_verwaltung);
 $valid_users = array_keys($valid_passwords);
 
 $user = $_SERVER['PHP_AUTH_USER'];
