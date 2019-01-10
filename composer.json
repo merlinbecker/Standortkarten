@@ -1,0 +1,16 @@
+{
+    "name": "merlinbecker/standortkarten",
+    "description": "A web based visualisation of geospatial data",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "merlinbecker",
+            "email": "merlin.becker@googlemail.com"
+        }
+    ],
+    "minimum-stability": "RC",
+    "require": {
+	"paragonie/easydb":"^2"
+    }
+}

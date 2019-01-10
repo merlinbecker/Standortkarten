@@ -1,52 +1,26 @@
 <?php
 /**
-Der Webservice für die Stein Verlag Standortkarten
+Der Webservice Standortkarten
 @author Merlin Becker
 @date 10.04.2014
 @version 2.0
 @since 0.2
 @update 03.06.2018
+@update 09.01.2019: Aenderung der Datenbankstruktur
+@todo: Filtersettings wieder einf�hren und ggf. Anfragen speichern
 **/
+require_once("vendor/autoload.php");
 error_reporting(1);
-
-/**
-legacy code, maybe delete
-**/
-if (!function_exists('json_decode')){
-    function json_decode($content, $assoc=false) {
-        require_once 'JSON.php';
-        if ($assoc) {
-            $json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
-        }
-        else {
-            $json = new Services_JSON;
-        }
-        return $json->decode($content);
-    }
-}
-
-if (!function_exists('json_encode')){
-    function json_encode($content) {
-        require_once 'JSON.php';
-        $json = new Services_JSON;
-        return $json->encode($content);
-    }
-}
-
-/*legacy code end*/
-
 session_start();
-
-define("VERSION","2.0");
-define("CMS_KLASSEN","");
-
+define("VERSION","2.1.1");
 require_once("dbconfig.php");
-require_once('DB_Verbindung.php');
 
-$GLOBALS['db']=new DB_Verbindung("SELECT 1");
+$db=\ParagonIE\EasyDB\Factory::create(
+	'mysql:host='.$host.';dbname='.$datenbank,
+	$nutzer,
+	$passwort);
 
-
-//für die Anfrage von Infos
+//f�r die Anfrage von Infos
 if(isset($_POST['d'])){
 	$result=array();
 	$data=json_decode(base64_decode($_POST['d']));
@@ -54,187 +28,105 @@ if(isset($_POST['d'])){
 		/* !getBranchen: @TODO ABFRAGE ob erlaubt */
 		case "getBranchen":
 			if(isLoggedIn()){
-				
-				$GLOBALS['db']->neueAnfrage("SELECT * FROM _sk_branche WHERE _sk_branche.id IN (SELECT  DISTINCT branche FROM _sk_nutzer_bundesland_branche WHERE nutzerid=".$_SESSION['nutzer']['id'].")");
-				/*
-				$anfrage="SELECT branche FROM _sk_nutzer_bundesland_branche WHERE nutzerid=".$_SESSION['nutzer']['id']." GROUP BY branche;";
-				$GLOBALS['db']->neueAnfrage($anfrage);
-				$temp=array();
-				do{
-					$temp[]=$GLOBALS['db']->antwort_reihe['branche'];
-				}while($GLOBALS['db']->neueReihe());
-				
-				
-				//$GLOBALS['db']->neueAnfrage("SELECT * FROM _sk_branche ");
-				$GLOBALS['db']->neueAnfrage("SELECT * FROM _sk_branche WHERE id IN (".implode(",",$temp).");");
-				
-				echo "SELECT * FROM _sk_branche WHERE id IN (".implode(",",$temp).");";
-				*/
-			//	$GLOBALS['db']->neueAnfrage("SELECT * FROM _sk_branche ");
-				$laender=array();
-				if($GLOBALS['db']->antwort_anzahl>0){
-				do{
-				$GLOBALS['db']->antwort_reihe['beschreibung']=utf8_encode($GLOBALS['db']->antwort_reihe['beschreibung']);
-				$GLOBALS['db']->antwort_reihe['selected']=in_array($GLOBALS['db']->antwort_reihe['id'], $_SESSION['nutzer']['filtersettings']['branchen'])?true:false;
-				
-				$laender[]=$GLOBALS['db']->antwort_reihe;
-				}while($GLOBALS['db']->neueReihe());	
+				$branchen=$db->run("SELECT * FROM _sk_branche WHERE _sk_branche.id IN (SELECT  DISTINCT branche FROM _sk_nutzer_bundesland_branche WHERE nutzerid=?)",
+					$_SESSION['nutzer']['id']);				
+				$output=array();
+				foreach ($branchen as $branche){
+					$branche['beschreibung']=utf8_encode($branche['beschreibung']);
+					$branche['selected']=in_array($branche['id'], $_SESSION['nutzer']['filtersettings']['branchen'])?true:false;
+					$output[]=$branche;
 				}
 				$result['status']="success";
-				$result['data']=$laender;
-			}
-		break;
-		/* !sendMessage */
-		case "sendMessage":
-			if(isLoggedIn()){
-				if(isset($data->betreff,$data->nachricht)){
-					//versende die Mail
-				$empfaenger  = "Iris.Merkel@stein-verlaggmbh.de";
-				// Betreff
-				$betreff = "Feedback zur Standortkarten Applikation: ".$data->betreff;
-				// Nachricht
-				$nachricht = "
-				<html>
-				<head>
-					<title>".$betreff."</title>
-				</head>
-				<body>".$data->nachricht."</body></html>";
-				
-// für HTML-E-Mails muss der 'Content-type'-Header gesetzt werden
-$header  = 'MIME-Version: 1.0' . "\r\n";
-$header .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-
-// zusätzliche Header
-$header .= "To: Standortkarten Administrator <".$empfaenger.">" . "\r\n";
-$header .= "From: Standortkarten Nutzer <".$_SESSION['nutzer']['email'].">". "\r\n";
-
-// verschicke die E-Mail
-mail($empfaenger, $betreff, $nachricht, $header);
-				$result['status']="success";
-				}
-				else $result['status']="error";
-								
+				$result['data']=$output;
 			}
 		break;
 		/* !getBundeslaender: @TODO ABFRAGE ob erlaubt */
 		case "getBundeslaender":
 			if(isLoggedIn()){
-				$GLOBALS['db']->neueAnfrage("SELECT * FROM _sk_bundesland WHERE id<13 AND _sk_bundesland.id IN (SELECT DISTINCT bundesland FROM _sk_nutzer_bundesland_branche WHERE nutzerid=".$_SESSION['nutzer']['id'].")");
-				
-				//$GLOBALS['db']->neueAnfrage("SELECT * FROM _sk_bundesland WHERE id<13");
-				$laender=array();
-				if($GLOBALS['db']->antwort_anzahl>0){
-				do{
-					$GLOBALS['db']->antwort_reihe['beschreibung']=utf8_encode($GLOBALS['db']->antwort_reihe['beschreibung']);
-					$GLOBALS['db']->antwort_reihe['selected']=in_array($GLOBALS['db']->antwort_reihe['id'], $_SESSION['nutzer']['filtersettings']['laender'])?true:false;
-					
-					//lade Bundesland GeoJson je nach Typ
-					
-					switch($GLOBALS['db']->antwort_reihe['id']){
+				$laender=$db->run("SELECT * FROM _sk_bundesland WHERE id<13 AND _sk_bundesland.id IN (SELECT DISTINCT bundesland FROM _sk_nutzer_bundesland_branche WHERE nutzerid=?)",
+					$_SESSION['nutzer']['id']
+				);
+				$output=array();
+				foreach($laender as $land){
+					$land['beschreibung']=utf8_encode($land['beschreibung']);
+					$land['selected']=in_array($land['id'], $_SESSION['nutzer']['filtersettings']['laender'])?true:false;
+					$g=$l="";
+					switch($land['id']){
 						case 1:
-							$grenzen="data/bundeslaender/BW.geojson";
-							$lk="data/landkreise/lk-bw.geojson";
+							$g="BW";
+							$l="lk-bw";
 						break;
 						case 2:
-							$grenzen="data/bundeslaender/BY.geojson";
-							$lk="data/landkreise/lk_by.geojson";
+							$g="BY";
+							$l="lk_by";
 						break;
 						case 3:
-							$grenzen="data/bundeslaender/Brandenburg-Berlin.geojson";
-							$lk="data/landkreise/lk_brandenburg-berlin.geojson";
+							$g="Brandenburg-Berlin";
+							$l="lk_brandenburg-berlin";
 						break;
 						case 4:
-							$grenzen="data/bundeslaender/Hessen.geojson";
-							$lk="data/landkreise/lk_hessen.geojson";
+							$g="Hessen";
+							$l="lk_hessen";
 						break;
 						case 5:
-							$grenzen="data/bundeslaender/Meck-Vorpommern.geojson";
-							$lk="data/landkreise/lk_meck-vorpommern.geojson";
+							$g="Meck-Vorpommern";
+							$l="lk_meck-vorpommern";
 						break;
 						case 6:
-							$grenzen="data/bundeslaender/Niedersachsen-Bremen.geojson";
-							$lk="data/landkreise/lk_niedersachsen-bremen.geojson";
+							$g="Niedersachsen-Bremen";
+							$l="lk_niedersachsen-bremen";
 						break;
 						case 7:
-							$grenzen="data/bundeslaender/Nordrhein-Westfalen.geojson";
-							$lk="data/landkreise/lk_Nordrhein-Westfalen.geojson";
+							$g="Nordrhein-Westfalen";
+							$l="lk_Nordrhein-Westfalen";
 						break;
 						case 8:
-							$grenzen="data/bundeslaender/Rheinland-Pfalz.geojson";
-							$lk="data/landkreise/lk_Rheinland-Pfalz.geojson";
+							$g="Rheinland-Pfalz";
+							$l="lk_Rheinland-Pfalz";
 						break;
 						case 9:
-							$grenzen="data/bundeslaender/Sachsen-Anhalt.geojson";
-							$lk="data/landkreise/lk_Sachsen-Anhalt.geojson";
+							$g="Sachsen-Anhalt";
+							$l="lk_Sachsen-Anhalt";
 						break;
 						case 10:
-							$grenzen="data/bundeslaender/Sachsen.geojson";
-							$lk="data/landkreise/lk_Sachsen.geojson";
+							$g="Sachsen";
+							$l="lk_Sachsen";
 						break;
 						case 11:
-							$grenzen="data/bundeslaender/Schleswig-Holstein-Hamburg.geojson";
-							$lk="data/landkreise/lk_Schleswig-Holstein-Hamburg.geojson";
+							$g="Schleswig-Holstein-Hamburg";
+							$l="lk_Schleswig-Holstein-Hamburg";
 						break;
 						case 12:
-							$grenzen="data/bundeslaender/Thueringen.geojson";
-							$lk="data/landkreise/lk_thueringen.geojson";
+							$g="Thueringen";
+							$l="lk_thueringen";
 						break;
 							
 					}
-					
-					$GLOBALS['db']->antwort_reihe['grenzen']=json_decode(file_get_contents($grenzen));
-					$GLOBALS['db']->antwort_reihe['landkreise']=json_decode(file_get_contents($lk));
-					
-					
-					$laender[]=$GLOBALS['db']->antwort_reihe;
-				}while($GLOBALS['db']->neueReihe());	
-				}
+					$grenzen="data/bundeslaender/".$g.".geojson";
+					$lk="data/landkreise/".$l.".geojson";
+					$land['grenzen']=json_decode(file_get_contents($grenzen));
+					$land['landkreise']=json_decode(file_get_contents($lk));
+					$output[]=$land;
+				}	
 				$result['status']="success";
-				$result['data']=$laender;
+				$result['data']=$output;
 			}
 		break;
-		/* !updateLocation */
-		case "updateLocation":
-			if(isset($data->location)&&isLoggedIn()){
-					
-					$acc=$data->location->accuracy;
-					$lon=$data->location->longitude;
-					$lat=$data->location->latitude;
-					
-					$anfrage="UPDATE _sk_nutzer SET last_lon=".$lon.",last_lat=".$lat.",last_accuracy=".$acc." WHERE id=".$_SESSION['nutzer']['id'];
-					$GLOBALS['db']->neueAnfrage($anfrage);
-					
-					$_SESSION['nutzer']['location']['accuracy']=$acc;
-					$_SESSION['nutzer']['location']['longitude']=$lon;
-					$_SESSION['nutzer']['location']['latitude']=$lat;
-			
-					$result['status']="success";
-					$result['message']="Ihr Standort wurde gespeichert!";
-			}
-		break;
-		
 		/* !get Infos: @TODO: Abfragen, ob Infos verfügbar, bzw. Paket gekauft */
 		case "getInfos":
 			if(isset($data->ident)&&isLoggedIn()){
 				$data->ident=(int)$data->ident;
-				$anfrage="SELECT * FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE id=".$data->ident;
-				$GLOBALS['db']->neueAnfrage($anfrage);
-				if($GLOBALS['db']->antwort_anzahl>0){
+				$standort=$db->row("SELECT * FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE id=?",$data->ident);
 				/**
 				TODO ACHTUNG
 				Remove beim nächsten mal
 				***/
-					//if($GLOBALS['db']->antwort_reihe['id']>5551){
-						foreach($GLOBALS['db']->antwort_reihe as &$value){
-							$value=utf8_encode($value);
+				foreach($standort as &$value){
+					$value=utf8_encode($value);
                 
-						}
-						
-					//}
-					
-					$result['status']="success";
-					$result['data']=$GLOBALS['db']->antwort_reihe;
 				}
+				$result['status']="success";
+				$result['data']=$standort;
 			}
 			else{
 				$result['status']="error";
@@ -246,7 +138,7 @@ mail($empfaenger, $betreff, $nachricht, $header);
 		break;
 		/* !login */
 		case "login":
-			$result=login($data);
+			$result=login($data,$db);
 		break;
 		case "checkLogin":
 			if(isLoggedIn()){
@@ -260,88 +152,26 @@ mail($empfaenger, $betreff, $nachricht, $header);
 		/* !Logout */
 		case "logout":
 			unset($_SESSION['nutzer']);
-			echo base64_encode("{\"status\":\"error\"}");
+			output_error();
 
 		break;
-		/* !getPinsByUmkreis: @TODO: prüfen, ob die Daten abgefragt werden können */
-		case "getPinsByUmkreis":
-			if(isset($data->radius)){
-				$lat=(float)$data->location->latitude;
-				$lon=(float)$data->location->longitude;
-			
-				$entfernung=(int)$data->radius/1000;
-			
-			$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,bundesland,branche, ( 6371 * acos( cos( radians(".$lat.") ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(".$lon.") ) + sin( radians(".$lat.") ) * sin( radians( lat ) ) ) ) AS distance FROM _sk_standorte".$_SESSION['testversion_suffix']." HAVING (distance <=".$entfernung.") AND (".filternachBranchen().") ORDER BY distance;";
-			
-			$GLOBALS['db']->neueAnfrage($anfrage);
-					
-					if($GLOBALS['db']->antwort_anzahl>0){
-						do{
-							$result['data'][]=$GLOBALS['db']->antwort_reihe;
-						}while($GLOBALS['db']->neueReihe());}
-						$result['status']="success";
-		}else{
-			$result['status']="error";
-			$result['version']=VERSION;
-		}
-		break;
-		/* !getPinsBySearch: @TODO:prüfen, ob die Daten abgefragt werden können */
-		case "getPinsBySearch":
-			if(isLoggedIn()&&isset($data->suche)){
-					//1. die Query aufspalten in einzelne Worte
-					$query=explode(" ",$data->suche);
-					$reihen=array();
-					$kriterium=array();
-					
-					$reihen[]="Vorname";
-					$reihen[]="Name1";
-					$reihen[]="Name2";
-					$reihen[]="Name3";
-					$reihen[]="Strasse";
-					$reihen[]="PLZStrasse";
-					$reihen[]="Ort";
-					$reihen[]="Telefon";
-					$reihen[]="Telefax";
-					$reihen[]="Email";
-					
-					foreach ($query as $qstring) {
-					$suchbegriffe=array();
-					foreach($reihen as $spalte){
-						$suchbegriffe[]="(".mysql_real_escape_string($spalte)." LIKE '%".mysql_real_escape_string($qstring)."%'".")";
-					}
-					$kriterium[]=implode("OR",$suchbegriffe);
-					}
-					
-					$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,branche FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE (".filternachBranchen().") AND (".implode("OR",$kriterium). ") ORDER by lat DESC";
-					$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,branche FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE (".filternachBranchen().") AND (".implode("OR",$kriterium). ") ORDER by lat DESC";
-					$GLOBALS['db']->neueAnfrage($anfrage);
-					
-					if($GLOBALS['db']->antwort_anzahl>0){
-						do{
-							$GLOBALS['db']->antwort_reihe['Name1']=$GLOBALS['db']->antwort_reihe['Name1'];	
-							$GLOBALS['db']->antwort_reihe['Name2']=$GLOBALS['db']->antwort_reihe['Name2'];	
-							$GLOBALS['db']->antwort_reihe['Name3']=$GLOBALS['db']->antwort_reihe['Name3'];
-							$result['data'][]=$GLOBALS['db']->antwort_reihe;
-						}while($GLOBALS['db']->neueReihe());
-					$result['status']="success";
-				}
-				else{
-					$result['status']="success";
-					$result['data']=array();
-				}
-			}
-			else $result['status']="error";
-		break;
-		
-		
 		/* !getPins */
 		/*liefert die Pins nach Bundesland oder Branche*/
 		case "getPins":
 			if(isLoggedIn()&&isset($data->bundesland,$data->branche)){				
 				//Bundesland und Branche vermischen
 				$laender=explode(",",$data->bundesland);
-				$branchen=explode(",",$data->branche);
 				
+				//mysql injection test
+				foreach($laender as $land){
+					if(!is_numeric($land))output_error();
+				}
+				$branchen=explode(",",$data->branche);
+
+				foreach($branchen as $branche){
+					if(!is_numeric($branche))output_error();
+				}
+
 				//Natursteinfix
 				if(in_array(4,$branchen)){
 					if(in_array(6,$laender)||in_array(11,$laender)){
@@ -359,54 +189,37 @@ mail($empfaenger, $betreff, $nachricht, $header);
 				
 				$_SESSION['nutzer']['filtersettings']=$filtersettings;
 				
-				$anfrage="UPDATE _sk_nutzer SET last_filter='".serialize($filtersettings)."' WHERE id=".$_SESSION['nutzer']['id'];
-				$GLOBALS['db']->neueAnfrage($anfrage);				
-				//$anfrage="SELECT id,Name1,Name2,Name3,lat,lng,branche FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE ".filternachBranchen()." ORDER by lat DESC";
+				
 				$anfrage="SELECT * FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE ".filternachBranchen()." ORDER by lat DESC";
-				$GLOBALS['db']->neueAnfrage($anfrage);
+				$pins=$db->run($anfrage);
 				
 				$result['data']['type']="FeatureCollection";
 				$result['data']['features']=array();
 				
-				if($GLOBALS['db']->antwort_anzahl>0){
-				
-					do{
-					/*
-          if($GLOBALS['db']->antwort_reihe['id']>5551){
+				foreach($pins as $pin){
 					/**
 					ACHTUNG 
 					TODO:
 					beim nächsten mal muss das hier weg!!
 					**/
 					$temp['type']="Feature";
-					$temp['id']=$GLOBALS['db']->antwort_reihe['id'];
-					/*
-					foreach($GLOBALS['db']->antwort_reihe as &$value){
-							if($_SESSION['testversion_suffix']=="_demo")
-								$value=utf8_encode($value);
-                
-					}*/
+					$temp['id']=$pin['id'];
 					
-					$GLOBALS['db']->antwort_reihe['type']="Feature";
-					/*$GLOBALS['db']->antwort_reihe['Name1']=utf8_encode($GLOBALS['db']->antwort_reihe['Name1']);	
-					$GLOBALS['db']->antwort_reihe['Name2']=utf8_encode($GLOBALS['db']->antwort_reihe['Name2']);	
-					$GLOBALS['db']->antwort_reihe['Name3']=utf8_encode($GLOBALS['db']->antwort_reihe['Name3']);	*/
-					$temp['properties']=$GLOBALS['db']->antwort_reihe;
+					$pin['type']="Feature";
+					$temp['properties']=$pin;
 					
 					$geom['type']="Point";
 					$geom['coordinates']=array();
-					$geom['coordinates'][]=$GLOBALS['db']->antwort_reihe['lng'];
-					$geom['coordinates'][]=$GLOBALS['db']->antwort_reihe['lat'];
+					$geom['coordinates'][]=$pin['lng'];
+					$geom['coordinates'][]=$pin['lat'];
 					
 					$temp['geometry']=$geom;
 					
-					$result['data']['features'][]=$temp;	
-					
-					}while($GLOBALS['db']->neueReihe());
-					$result['status']="success";
+					$result['data']['features'][]=$temp;
 				}
-				
-			}
+
+				$result['status']="success";
+			}	
 			else{
 				$result['status']="error";
 				$result['version']=VERSION;
@@ -417,6 +230,14 @@ mail($empfaenger, $betreff, $nachricht, $header);
 }
 else{
 	header("HTTP/1.0 404 Not Found");
+}
+
+//echo an error
+function output_error(){
+	$result=array();
+	$result['status']="error";
+	$result['version']=VERSION;
+	die(base64_encode(json_encode($result)));
 }
 
 /**
@@ -432,10 +253,10 @@ function filternachBranchen(){
 	$kondition="";
 	$kriterium=array();
 	if(count($_SESSION['nutzer']['filtersettings']['laender'])==0){
-		$kondition="branche IN (".mysql_real_escape_string(implode(",",$_SESSION['nutzer']['filtersettings']['branchen'])).")";
+		$kondition="branche IN (".implode(",",$_SESSION['nutzer']['filtersettings']['branchen']).")";
 	}
 	else if(count($_SESSION['nutzer']['filtersettings']['branchen'])==0){
-		$kondition="bundesland IN (".mysql_real_escape_string(implode(",",$_SESSION['nutzer']['filtersettings']['laender'])).")";
+		$kondition="bundesland IN (".implode(",",$_SESSION['nutzer']['filtersettings']['laender']).")";
 	}
 	else{
 		foreach($_SESSION['nutzer']['filtersettings']['laender'] as $land){
@@ -451,7 +272,6 @@ function filternachBranchen(){
 	}
 	$kondition=implode("OR",$kriterium);
 	}	
-	
 	return $kondition;
 }
 
@@ -477,75 +297,47 @@ login. prüft Nutzerdaten und liefert ggf.den Namen des Nutzers zurück, setzt a
 @param $logindata Nutzername und Kennwort
 @return $nutzerdaten
 ***/
-function login($logindata){
-	$anfrage="SELECT * FROM _sk_nutzer WHERE email='".mysql_real_escape_string($logindata->username)."'";//."' AND passwort='".mysql_real_escape_string($logindata->passwort)."'";
-	$GLOBALS['db']->neueAnfrage($anfrage);
+function login($logindata,$db){
+	$nutzer=$db->row("SELECT * FROM _sk_nutzer WHERE email=?",$logindata->username);	
 	
-	echo $GLOBALS['db']->fehlermeldung;
-	if($GLOBALS['db']->antwort_anzahl>0){
-		/**
-		auf die Testversion abprüfen und ggf. ein Flag setzen
-		**/
-
-    if(!password_verify($logindata->passwort, $GLOBALS['db']->antwort_reihe['passwort'])){
-     $result=array();
+	if(!isset($nutzer['passwort']))output_error();	
+	
+	if(!password_verify($logindata->passwort, $nutzer['passwort'])){
+     		$result=array();
   		$result['status']="error";
   		$result['details']="username_wrong";
   		$result['version']=VERSION;
   		return $result;
-    }
+    	}
 	
-		$result=$GLOBALS['db']->antwort_reihe;
+	$result=$nutzer;
 		
-		$result['passwort']="";
-		$result['status']="success";
-		$result['version']=VERSION;
+	$result['passwort']="";
+	$result['status']="success";
+	$result['version']=VERSION;
+	
+	$_SESSION['nutzer']=$result;
 		
-		
-		$result['filtersettings']=unserialize($result['last_filter']);
-		if(!is_array($result['filtersettings']['laender']))$result['filtersettings']['laender']=array();
-		if(!is_array($result['filtersettings']['branchen']))$result['filtersettings']['branchen']=array();
-
-		$result['location']['accuracy']=$result['last_accuracy'];
-		$result['location']['longitude']=$result['last_lon'];
-		$result['location']['latitude']=$result['last_lat'];
-		
-		$_SESSION['nutzer']=$result;
-		
-		if($logindata->username=="test@test.de"){
-			$_SESSION['testversion_suffix']="_demo";
-			$_SESSION['nutzer']['testversion']="Testversion";
-			$result['testversion']="Testversion";
-		}
-			else{ 
-			
-			/**
-			UPDATE 08.09.2015: Alle Nutzer nach dem 07.08 bekommen die Datenbank version 2
-			
-			**/
-			if($result['time']>1438905600){
-				$_SESSION['testversion_suffix']="_v2";
-				$_SESSION['nutzer']['testversion']="Normalversion";
+	if($logindata->username=="test@test.de"){
+		$_SESSION['testversion_suffix']="_demo";
+		$_SESSION['nutzer']['testversion']="Testversion";
+		$result['testversion']="Testversion";
+	}
+	else{ 
+		/**
+		UPDATE 08.09.2015: Alle Nutzer nach dem 07.08 bekommen die Datenbank version 2		
+		**/
+		if($result['time']>1438905600){
+			$_SESSION['testversion_suffix']="_v2";
+			$_SESSION['nutzer']['testversion']="Normalversion";
 			$result['testversion']="Normalversion";	
-			}
-			else{
+		}
+		else{
 			$_SESSION['testversion_suffix']="";
 			$_SESSION['nutzer']['testversion']="Normalversion";
 			$result['testversion']="Normalversion";
-			}
 		}
-		//setze noch das last login timestamp
-		$anfrage="UPDATE _sk_nutzer set last_login=".time()." WHERE id=".$result['id'];
-		$GLOBALS['db']->neueAnfrage($anfrage);
-		
-		return $result;
 	}
-	else{
-		$result=array();
-		$result['status']="error";
-		$result['details']="username_wrong";
-		$result['version']=VERSION;
-		return $result;
-	}
+	return $result;
 }
 ?>
