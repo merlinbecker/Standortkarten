@@ -1,5 +1,6 @@
 <?php
-require_once("../dbconfig.php");
+require_once("../vendor/autoload.php");
+
 $valid_passwords = array ($nutzer_verwaltung => $pw_verwaltung);
 $valid_users = array_keys($valid_passwords);
 
@@ -9,7 +10,7 @@ $pass = $_SERVER['PHP_AUTH_PW'];
 $validated = (in_array($user, $valid_users)) && ($pass == $valid_passwords[$user]);
 
 if (!$validated) {
-  header('WWW-Authenticate: Basic realm="My Realm"');
+  header('WWW-Authenticate: Basic realm="Standortkarten Verwaltung"');
   header('HTTP/1.0 401 Unauthorized');
   die ("Sie haben die falschen Benutzerdaten eingegeben.");
 }
@@ -18,11 +19,13 @@ session_start();
 $_SESSION['is_admin']=true;
 
 if(isset($_POST['command'])){
-	define("CMS_KLASSEN","../");
 	require_once("../dbconfig.php");
-	require_once('../DB_Verbindung.php');
-	$db=new DB_Verbindung("SELECT 1");
 	
+	$db=\ParagonIE\EasyDB\Factory::create(
+		'mysql:host='.$host.';dbname='.$datenbank,
+		$nutzer,
+		$passwort);
+
 	switch($_POST['command']){
 		case "fetchStandortData":
 			$suffix=$_POST['suffix'];
@@ -42,55 +45,23 @@ if(isset($_POST['command'])){
 			$ausgabe['bundeslaender']=array();
 			$ausgabe['branchen']=array();
 			$ausgabe['standorte']=array();
-			$anfrage="SELECT * FROM _sk_bundesland";
-			$db->neueAnfrage($anfrage);
-			if($db->antwort_anzahl>0){
-				do{
-					$ausgabe['bundeslaender'][]=$db->antwort_reihe;
-				}while($db->neueReihe());
-			}
 			
-			$anfrage="SELECT * FROM _sk_branche";
-			$db->neueAnfrage($anfrage);
-			if($db->antwort_anzahl>0){
-				do{
-					$ausgabe['branchen'][]=$db->antwort_reihe;
-				}while($db->neueReihe());
-			}
-			
-			$anfrage="SELECT * FROM ".$tabelle.$condition;
-			$db->neueAnfrage($anfrage);
-			if($db->antwort_anzahl>0){
-				do{
-					$ausgabe['standorte'][]=$db->antwort_reihe;
-				}while($db->neueReihe());
-			}
+			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland");
+			$ausgabe['branchen']=$db->run("SELECT * FROM _sk_branche");
+			$ausgabe['standorte']=$db->run("SELECT * FROM ".$tabelle.$condition);
 			echo json_encode($ausgabe);
 		break;
 		
 		case "fetchAboData":
-		$ausgabe=array();
-		
-		$ausgabe['bundeslaender']=array();
-		$ausgabe['branchen']=array();
-		
-		$anfrage="SELECT * FROM _sk_bundesland";
-		$db->neueAnfrage($anfrage);
-		if($db->antwort_anzahl>0){
-			do{
-				$ausgabe['bundeslaender'][]=$db->antwort_reihe;
-			}while($db->neueReihe());
-		}
-		
-		$anfrage="SELECT * FROM _sk_branche";
-		$db->neueAnfrage($anfrage);
-		if($db->antwort_anzahl>0){
-			do{
-				$ausgabe['branchen'][]=$db->antwort_reihe;
-			}while($db->neueReihe());
-		}
-		$anfrage="SELECT id,email,anrede,name,firma,anschrift FROM _sk_nutzer ORDER BY firma ASC";
-		$db->neueAnfrage($anfrage);
+			$ausgabe=array();	
+			$ausgabe['bundeslaender']=array();
+			$ausgabe['branchen']=array();
+			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland");
+			$ausgabe['branchen']=$db->run("SELECT * FROM _sk_branche");	
+	
+			$anfrage="SELECT id,email,anrede,name,firma,anschrift FROM _sk_nutzer ORDER BY firma ASC";
+
+			$db->neueAnfrage($anfrage);
 		if($db->antwort_anzahl>0){
 		$abonnenten=array();
 			do{				
