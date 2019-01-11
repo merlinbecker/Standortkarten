@@ -91,8 +91,176 @@ $(document).ready(function(evt){
 	
 	holeAbonnenten();
 	holeStandorte(1,1,"_v2");
+	holePrint(1,1,"_v2");
 });
 
+function holePrint(branche,bundesland,datensatz){
+	$.post("#","command=fetchPrintingQueue&branche="+branche+"&bundesland="+bundesland+"&suffix="+datensatz,function(data){
+		$("#printwerk").empty();	
+		var printqueue=JSON.parse(data);
+		console.log(printqueue);
+		
+		var branchen="";
+		$.each(printqueue.branchen,function(index,value){
+			var selected="";
+			if(value.id==branche)selected="selected=\"selected\"";
+			branchen+="<option value=\""+value.id+"\" "+selected+">"+value.beschreibung+"</option>";
+		});
+		
+		var bundeslaender="";
+		$.each(printqueue.bundeslaender,function(index,value){
+			var selected="";
+			if(value.id==bundesland)selected="selected=\"selected\"";
+			bundeslaender+="<option value=\""+value.id+"\" "+selected+">"+value.beschreibung+"</option>";
+		});
+		
+		var datenbank="";
+		$.each(datensaetze,function(index,value){
+			var selected="";
+			if(value.id==datensatz)selected="selected=\"selected\"";
+			datenbank+="<option value=\""+value.id+"\" "+selected+">"+value.beschreibung+"</option>";
+		});
+		
+		//Formular für die Branchen-Bundesland-Datenbank Auswahl
+		var html=`
+		<div class="standorte_bbdb_auswahl">	
+		<form class="form-inline">
+			<select class="form-control" id="pq_branche_select">
+				<option selected disabled>Branche wählen:</option>
+				${branchen}
+			</select>
+			<select class="form-control" id="pq_bundesland_select">
+				<option selected disabled>Bundesland wählen:</option>
+				${bundeslaender}
+			</select>
+			<select class="form-control" id="pq_datenbank_select">
+				<option selected disabled>Datensatz wählen:</option>
+				${datenbank}
+			</select>
+		</form></div>
+		`
+		
+		html+=`<ul class="list-group list" id="printqueue_list"></ul>
+		`
+		$("#printwerk").append($(html));
+
+		//f�r jede branche und jedes Bundeland
+
+		$.each(printqueue.queue,function(ind,value){
+			let html=`<li class="list-group-item">
+			#${value.id} (${getWerkArt(value.Art)})<h5 class="standort_name">${value.Name1} ${value.Name2} ${value.Name3}</h5>
+			${value.Strasse} | ${value.PLZStrasse} <span class="standort_ort"> ${value.Ort}</span><br/>
+			<span class="standort_tel">${value.Telefon} | ${value.Email} | ${value.Internet}</span>
+			<div class="collapse" id="standortmenu_${value.id}">
+			<br/><button type="button" class="standortedit btn btn-primary" data-ref="${value.id}"><i class="fa fa-edit"></i>&nbsp;Standort bearbeiten</button>&nbsp;
+			<button type="button" class="standortmove btn btn-primary" data-ref="${value.id}" data-lng="${value.lng}" data-lat="${value.lat}"><i class="fa fa-map-pin"></i>&nbsp;Standort verschieben</button>&nbsp;
+			<button type="button" class="standortdelete btn btn-danger" data-ref="${value.id}" ><i class="fa fa-trash"></i>&nbsp;Entfernen</button>	
+			</div>
+			`;
+			let el=$(html);
+			el.click(function(evt){
+				$("#standortmenu_"+value.id).collapse();
+			});
+			$("#standorte_list").append(el);
+			$("#standortmenu_"+value.id).data("standort",value);
+		});
+		
+		$("#st_branche_select,#st_bundesland_select,#st_datenbank_select").change(function(evt){
+			holeStandorte($("#st_branche_select").val(),$("#st_bundesland_select").val(),$("#st_datenbank_select").val());
+		});
+		var hackerList = new List('standort', standort_options);
+		hackerList.sort("standorte_name", {order:"asc"});
+		
+		
+		$(".standortdelete").click(function(evt){
+			if(confirm("Möchten Sie den Standort wirklich löschen?")){
+				var sid=$(this).attr("data-ref");
+				$.post( "#","command=deleteStandort&datensatz="+currentdatensatz+"&sid="+$(this).attr("data-ref"),function(data){
+				if(data=="success!"){
+					holeStandorte(currentbranche,currentbundesland,currentdatensatz);
+				}
+				});
+			}
+		});
+		
+		$(".standortmove").click(function(evt){
+			$("#moveStandortFormBody").empty();
+			if(map!=null)map.remove();
+			
+			$("#standortmove_sid").val($(this).attr("data-ref"));
+			$("#standortmove_datensatz").val(currentdatensatz);
+			
+			let html=`
+			<div class="alert alert-info" role="alert">
+			  Ziehen Sie die Karte, bis sich das Fadenkreuz über dem gewünschten neuen Standort befindet und klicken Sie auf <i>Standort versetzen</i>;.
+			</div>
+			  <div class="form-group">
+				<label for="standortmove_lat">Latitude</label>
+				<input type="text" readonly class="form-control-plaintext" id="standortmove_lat" name="lat" value="" />
+			  </div>
+			  <div class="form-group">
+				<label for="standortmove_lon">Longitude</label>
+				<input type="text" readonly class="form-control-plaintext" id="standortmove_lon" name="lon" value="" />
+			  </div>
+			  <button type="button" class="btn btn-primary mb-2" id="btn_moveStandort">Standort versetzen</button>
+			<div id="standortmove_map"></div>
+			`;
+			
+			$("#moveStandortFormBody").append($(html));
+			$("#standortmove_lat").val($(this).attr("data-lat"));
+			$("#standortmove_lon").val($(this).attr("data-lng"));
+			//now show the gui
+			$("#moveStandortModal").modal();
+		
+			let standort=$("#standortmenu_"+$(this).attr("data-ref")).data().standort;
+			//now init the map and put the pointer to it
+			map = L.map("standortmove_map", {
+			  zoom: 7,
+			  maxZoom:18,
+			  minZoom:7,
+			  maxBounds: bounds,
+			  useCache: true,
+			  crossOrigin: true,
+			  center: [51,10],
+			  layers: [osmde],
+			  zoomControl: true,
+			  attributionControl: true
+			});
+			
+			var feature={
+				properties:{
+					id:standort.id,
+					Art:standort.Art,
+					Name1:standort.Name1,
+					Name2:standort.Name2,
+					Name3:standort.Name3
+				}
+			}
+			
+			var latlng = new L.latLng($(this).attr("data-lat"), $(this).attr("data-lng"));
+			var temp=getMarkerColorsByBranche(currentbranche);
+			
+			currentmarker=createMarker(temp[0],temp[1],feature,latlng);	
+			currentmarker.addTo(map);
+			L.control.mapCenterCoord({
+				onMove:true
+			}).addTo(map);
+			
+			map.setView([$(this).attr("data-lat"),$(this).attr("data-lng")], 17);
+			
+			$("#btn_moveStandort").click(function(evt){
+				mitte=L.latLng(map.getCenter());
+				currentmarker.setLatLng(mitte);
+				map.setView(mitte, 17);
+				$("#standortmove_lat").val(mitte.lat);
+				$("#standortmove_lon").val(mitte.lng);
+			});
+			
+		});
+
+
+	});
+}
 
 
 function createAboTable(branchen,bundeslaender,nutzermatrix){

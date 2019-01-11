@@ -46,18 +46,15 @@
 	<!-- https://github.com/javve/list.js/blob/master/README.md -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js" integrity="sha256-YqOIp4MygNx9/lcWr5lpcR88Ki/MNMWvJJkH0eK+fHM=" crossorigin="anonymous"></script>
 	
-	
 	<!-- Handlebars.js -->
 	<!-- https://github.com/wycats/handlebars.js/ -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
-	
 	
 	<!-- custom css+js -->
 	<link rel="stylesheet" href="verwaltung.css"/>
 	<script src="../assets/js/svg-icon.js"></script>
 	<script src="../assets/js/marker.js"></script>
 	<script src="verwaltung.js"></script>
-	
 	
 	<link rel="apple-touch-icon" sizes="57x57" href="assets/img/fav/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="assets/img/fav/apple-icon-60x60.png">
@@ -73,6 +70,13 @@
 	<link rel="icon" type="image/png" sizes="96x96" href="assets/img/fav/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="assets/img/fav/favicon-16x16.png">
 	<link rel="manifest" href="/manifest.json">
+
+
+	<!--Handlebars Templates  -->
+	<script id="template_print" type="text/x-handlebars-template">
+		
+	</script>
+
   </head>
 
   <body>
@@ -101,10 +105,8 @@
 		
 		</ul>
     </div>
-	<div id="standort" class="container">
-    </div>
-	<div id="printwerk" class="container">
-    </div>
+	<div id="standort" class="container"></div>
+	<div id="printwerk" class="container"></div>
 	
 	<!-- The Modal -->
 	<div class="modal fade" id="newAboModal" tabindex="-1">

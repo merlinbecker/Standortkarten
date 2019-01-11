@@ -1,6 +1,6 @@
 <?php
 require_once("../vendor/autoload.php");
-
+require_once("../dbconfig.php");
 $valid_passwords = array ($nutzer_verwaltung => $pw_verwaltung);
 $valid_users = array_keys($valid_passwords);
 
@@ -19,7 +19,6 @@ session_start();
 $_SESSION['is_admin']=true;
 
 if(isset($_POST['command'])){
-	require_once("../dbconfig.php");
 	
 	$db=\ParagonIE\EasyDB\Factory::create(
 		'mysql:host='.$host.';dbname='.$datenbank,
@@ -39,7 +38,6 @@ if(isset($_POST['command'])){
 				else $condition.=" AND ";
 				$condition.="bundesland=".$_POST['bundesland'];
 			}
-			
 			$ausgabe=array();
 		
 			$ausgabe['bundeslaender']=array();
@@ -51,7 +49,39 @@ if(isset($_POST['command'])){
 			$ausgabe['standorte']=$db->run("SELECT * FROM ".$tabelle.$condition);
 			echo json_encode($ausgabe);
 		break;
-		
+		case "fetchPrintingQueue":
+			//first of all, check if the queue table exists
+			try{
+				$dbcheck = $db->run("SELECT 1 FROM _sk_map_render_queue");
+			}catch(Exception $e){
+				if($e->getCode()=="42S02"){
+					$db->run("CREATE TABLE _sk_map_render_queue ( "
+						."`dataset` VARCHAR(10) NOT NULL ,"
+						."`branche` TINYINT NOT NULL ," 
+						."`bundesland` TINYINT NOT NULL ,"
+						."`queued` TINYINT(2) DEFAULT 0 , "
+						."`updated` BIGINT DEFAULT 0 ) ENGINE = InnoDB");
+				}else return $e->getMessage();
+			}
+
+			$ausgabe=array();
+			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland");
+			$ausgabe['branchen']=$db->run("SELECT * FROM _sk_branche");
+			
+			$suffix=$_POST['suffix'];
+
+			$ausgabe['queue']=$db->run("SELECT queued,updated FROM _sk_map_render_queue WHERE dataset=? AND bundesland=? AND branche=?",$suffix,$_POST['bundesland'],$_POST['branche']);
+			if(count($ausgabe['queue']==0){
+				$db->insert("_sk_map_render_queue",array("dataset"=>$suffix,"bundesland"=>$_POST['bundesland'],"branche"=>$_POST['branche']));
+				$ausgabe['queue']['queued']=0;
+				$ausgabe['queue']['updated']=0;
+			}
+
+			//@todo check files
+			
+			echo json_encode($ausgabe);	
+
+		break;
 		case "fetchAboData":
 			$ausgabe=array();	
 			$ausgabe['bundeslaender']=array();
@@ -59,30 +89,16 @@ if(isset($_POST['command'])){
 			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland");
 			$ausgabe['branchen']=$db->run("SELECT * FROM _sk_branche");	
 	
-			$anfrage="SELECT id,email,anrede,name,firma,anschrift FROM _sk_nutzer ORDER BY firma ASC";
-
-			$db->neueAnfrage($anfrage);
-		if($db->antwort_anzahl>0){
-		$abonnenten=array();
-			do{				
-				$tempdb=new DB_Verbindung("SELECT bundesland,branche FROM _sk_nutzer_bundesland_branche WHERE nutzerid=".$db->antwort_reihe['id']);
-				
-				if($tempdb->antwort_anzahl>0){
-					do{
-						$db->antwort_reihe['buba_matrix'][]=$tempdb->antwort_reihe;
-					}while($tempdb->neueReihe());
-				}
-				$ausgabe['abonnenten'][]=$db->antwort_reihe;
-			}while($db->neueReihe());
-		}
+			$ausgabe['abonnenten']=$db->run("SELECT id,email,anrede,name,firma,anschrift FROM _sk_nutzer ORDER BY firma ASC");
+			foreach ($ausgabe['abonnenten'] as &$user){
+				$user['buba_matrix']=$db->run("SELECT bundesland,branche FROM _sk_nutzer_bundesland_branche WHERE nutzerid=?",$user['id']);
+			}
 		echo json_encode($ausgabe);
 		break;
 		case "changeLocation":
 			if(isset($_POST['id'],$_POST['suffix'])){
-				$anfrage="UPDATE _sk_standorte".$_POST['suffix']." SET lat=".$_POST['lat'].",lng=".$_POST['lon']." WHERE id=".$_POST['id'];
-				$db->neueAnfrage($anfrage);
-				
-				echo $db->fehlermeldung."success!";
+				$db->update("_sk_standorte".$_POST['suffix'],array("lat"=>$_POST['lat'],"lng"=>$_POST['lon']),array("id"=>$_POST['id']));
+				echo "success!";
 			}
 		break;
 		case "editStandort":
@@ -90,31 +106,20 @@ if(isset($_POST['command'])){
 				$ident=$_POST['id'];
 				$suffix=$_POST['suffix'];
 				unset($_POST['id'],$_POST['suffix'],$_POST['command']);
-				$anfrage="UPDATE _sk_standorte".$suffix." SET ";
-				$vars=array();
-				foreach($_POST as $key=>$value){
-					if(!is_numeric($value)){
-						$vars[]=$key."='".mysql_real_escape_string($value)."'";
-					}
-					else $vars[]=$key."=".$value;
-				}
-				$anfrage.=implode(",",$vars);
-				$anfrage.=" WHERE id=".$ident;
-				
-				$db->neueAnfrage($anfrage);
-				
-				echo $db->fehlermeldung."success!";
+
+				$db->update("_sk_standorte".$suffix,$_POST,["id"=>$ident]);
+				echo "success!";
 			}
 		break;
 	case "createUser":
 			if(isset($_POST['email'])){
 				//generiere einen Aktivierungslink
 				$activation=md5(time());
-				$anfrage="INSERT INTO _sk_nutzer (email,anrede,name,firma,time,activation) VALUES ('".mysql_real_escape_string($_POST['email'])."','".mysql_real_escape_string($_POST['anrede'])."','".mysql_real_escape_string($_POST['name'])."','".mysql_real_escape_string($_POST['firma'])."',".time().",'".$activation."')";
-				$db->neueAnfrage($anfrage);
+				$db->insert("_sk_nutzer",["email"=>$_POST['email'],"anrede"=>$_POST['anrede'],"name"=>$_POST['name'],"firma"=>$_POST['firma'],"time"=>time(),"activation"=>$activation]);
 				
 				//versende die Mail
 				$empfaenger  = $_POST['email'];
+				
 				// Betreff
 				$betreff="Ihr persönlicher Aktivierungslink für die Standortkarten Baustoffe";
 				$nachricht="<html>
@@ -151,26 +156,25 @@ if(isset($_POST['command'])){
 		break;
 		case "deleteStandort":
 			if(isset($_POST['datensatz'],$_POST['sid'])){
-				$db->neueAnfrage("DELETE FROM _sk_standorte".$_POST['datensatz']." WHERE id=".$_POST['sid']);
+				$db->delete("_sk_standorte".$_POST['datensatz'],["id"=>$_POST['sid']]);
 				echo "success!";
 			}
 		break;
 		case "delete":
-			$db->neueAnfrage("DELETE FROM _sk_nutzer_bundesland_branche WHERE nutzerid=".$_POST['uid']);
-			$db->neueAnfrage("DELETE FROM _sk_nutzer WHERE id=".$_POST['uid']);
+			$db->delete("_sk_nutzer_bundesland_branche",["nutzerid"=>$_POST['uid']]);
+			$db->delete("_sk_nutzer",array("id"=>$_POST['uid']));
 			echo "success!";
 		break;
 		case "changeSettings":
 			//zunächst alle Zuordnungen löschen
-			$db->neueAnfrage("DELETE FROM _sk_nutzer_bundesland_branche WHERE nutzerid=".$_POST['uid']);
+			$db->delete("_sk_nutzer",["nutzerid"=>$_POST['uid']]);
 			
 			//dann wieder einfügen
 			foreach($_POST['bubra'] as $bundesland => $branchen){
 				foreach($branchen as $branche=>$val){
-					$db->neueAnfrage("INSERT INTO _sk_nutzer_bundesland_branche (nutzerid,bundesland,branche) VALUES (".$_POST['uid'].",".$bundesland.",".$branche.")");
+					$db->insert("_sk_nutzer_bundesland_branche",["nutzerid"=>$_POST['uid'],"bundesland"=>$bundesland,"branche"=>$branche]);
 				}
 			}
-			
 			echo "success!";
 		break;
 	}
