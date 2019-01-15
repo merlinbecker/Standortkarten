@@ -148,7 +148,8 @@ function holePrint(branche,bundesland,datensatz){
 
 		$.each(printqueue.queue,function(ind,value){
 			let html=`<li class="list-group-item">
-			#${value.id} (${getWerkArt(value.Art)})<h5 class="standort_name">${value.Name1} ${value.Name2} ${value.Name3}</h5>
+			
+			${value.id} (${getWerkArt(value.Art)})<h5 class="standort_name">${value.Name1} ${value.Name2} ${value.Name3}</h5>
 			${value.Strasse} | ${value.PLZStrasse} <span class="standort_ort"> ${value.Ort}</span><br/>
 			<span class="standort_tel">${value.Telefon} | ${value.Email} | ${value.Internet}</span>
 			<div class="collapse" id="standortmenu_${value.id}">
@@ -172,94 +173,7 @@ function holePrint(branche,bundesland,datensatz){
 		hackerList.sort("standorte_name", {order:"asc"});
 		
 		
-		$(".standortdelete").click(function(evt){
-			if(confirm("Möchten Sie den Standort wirklich löschen?")){
-				var sid=$(this).attr("data-ref");
-				$.post( "#","command=deleteStandort&datensatz="+currentdatensatz+"&sid="+$(this).attr("data-ref"),function(data){
-				if(data=="success!"){
-					holeStandorte(currentbranche,currentbundesland,currentdatensatz);
-				}
-				});
-			}
-		});
-		
-		$(".standortmove").click(function(evt){
-			$("#moveStandortFormBody").empty();
-			if(map!=null)map.remove();
-			
-			$("#standortmove_sid").val($(this).attr("data-ref"));
-			$("#standortmove_datensatz").val(currentdatensatz);
-			
-			let html=`
-			<div class="alert alert-info" role="alert">
-			  Ziehen Sie die Karte, bis sich das Fadenkreuz über dem gewünschten neuen Standort befindet und klicken Sie auf <i>Standort versetzen</i>;.
-			</div>
-			  <div class="form-group">
-				<label for="standortmove_lat">Latitude</label>
-				<input type="text" readonly class="form-control-plaintext" id="standortmove_lat" name="lat" value="" />
-			  </div>
-			  <div class="form-group">
-				<label for="standortmove_lon">Longitude</label>
-				<input type="text" readonly class="form-control-plaintext" id="standortmove_lon" name="lon" value="" />
-			  </div>
-			  <button type="button" class="btn btn-primary mb-2" id="btn_moveStandort">Standort versetzen</button>
-			<div id="standortmove_map"></div>
-			`;
-			
-			$("#moveStandortFormBody").append($(html));
-			$("#standortmove_lat").val($(this).attr("data-lat"));
-			$("#standortmove_lon").val($(this).attr("data-lng"));
-			//now show the gui
-			$("#moveStandortModal").modal();
-		
-			let standort=$("#standortmenu_"+$(this).attr("data-ref")).data().standort;
-			//now init the map and put the pointer to it
-			map = L.map("standortmove_map", {
-			  zoom: 7,
-			  maxZoom:18,
-			  minZoom:7,
-			  maxBounds: bounds,
-			  useCache: true,
-			  crossOrigin: true,
-			  center: [51,10],
-			  layers: [osmde],
-			  zoomControl: true,
-			  attributionControl: true
 			});
-			
-			var feature={
-				properties:{
-					id:standort.id,
-					Art:standort.Art,
-					Name1:standort.Name1,
-					Name2:standort.Name2,
-					Name3:standort.Name3
-				}
-			}
-			
-			var latlng = new L.latLng($(this).attr("data-lat"), $(this).attr("data-lng"));
-			var temp=getMarkerColorsByBranche(currentbranche);
-			
-			currentmarker=createMarker(temp[0],temp[1],feature,latlng);	
-			currentmarker.addTo(map);
-			L.control.mapCenterCoord({
-				onMove:true
-			}).addTo(map);
-			
-			map.setView([$(this).attr("data-lat"),$(this).attr("data-lng")], 17);
-			
-			$("#btn_moveStandort").click(function(evt){
-				mitte=L.latLng(map.getCenter());
-				currentmarker.setLatLng(mitte);
-				map.setView(mitte, 17);
-				$("#standortmove_lat").val(mitte.lat);
-				$("#standortmove_lon").val(mitte.lng);
-			});
-			
-		});
-
-
-	});
 }
 
 

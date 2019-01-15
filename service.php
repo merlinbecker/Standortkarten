@@ -21,9 +21,12 @@ $db=\ParagonIE\EasyDB\Factory::create(
 	$passwort);
 
 //für die Anfrage von Infos
+echo "hallo3";
 if(isset($_POST['d'])){
 	$result=array();
+	echo "hallo1";
 	$data=json_decode(base64_decode($_POST['d']));
+	echo "hallo2";
 	switch($data->command){
 		/* !getBranchen: @TODO ABFRAGE ob erlaubt */
 		case "getBranchen":
@@ -141,12 +144,14 @@ if(isset($_POST['d'])){
 			$result=login($data,$db);
 		break;
 		case "checkLogin":
+			echo "hallo!!";
 			if(isLoggedIn()){
 				$result=$_SESSION['nutzer'];
 			}
 			else{
 				$result['status']="error";
 				$result['version']=VERSION;
+				print_r($result);
 			}
 		break;
 		/* !Logout */

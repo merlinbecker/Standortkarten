@@ -70,18 +70,44 @@ if(isset($_POST['command'])){
 			
 			$suffix=$_POST['suffix'];
 
-			$ausgabe['queue']=$db->run("SELECT queued,updated FROM _sk_map_render_queue WHERE dataset=? AND bundesland=? AND branche=?",$suffix,$_POST['bundesland'],$_POST['branche']);
+			$ausgabe['queue']=$db->run("SELECT queued,updated " 
+					."FROM _sk_map_render_queue WHERE dataset=? " 
+					."AND bundesland=? AND branche=?",
+					$suffix,$_POST['bundesland'],$_POST['branche']);
 			if(count($ausgabe['queue']==0){
-				$db->insert("_sk_map_render_queue",array("dataset"=>$suffix,"bundesland"=>$_POST['bundesland'],"branche"=>$_POST['branche']));
+				$db->insert("_sk_map_render_queue",
+					array("dataset"=>$suffix,
+					"bundesland"=>$_POST['bundesland'],
+					"branche"=>$_POST['branche']));
 				$ausgabe['queue']['queued']=0;
 				$ausgabe['queue']['updated']=0;
 			}
 
 			//@todo check files
-			
-			echo json_encode($ausgabe);	
+			if(!is_dir("printdata")){
+				if(!mkdir("printdata")){
+					throw new \Exception("could not create printdata folder");
+				}
+			}
+			$ausgabe['queue']['fn_din0']="printdata/din0".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".png";
+			if(!is_file($ausgabe['queue']['fn_din0']))$ausgabe['queue']['fn_din0']="";
 
+			$ausgabe['queue']['fn_preview']="printdata/preview".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".png";
+			if(!is_file($ausgabe['queue']['fn_preview']))$ausgabe['queue']['fn_preview']="";
+
+			$ausgabe['queue']['fn_text']="printdata/test".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".txt";
+			if(!is_file($ausgabe['queue']['fn_text'])$ausgabe['queue']['fn_text']="";
+			
+			echo json_encode($ausgabe);
 		break;
+		case "setPrintingDone":
+			if(isset($_POST['suffix'],$_POST['branche'],$_POST['bundesland'])){
+				$db->update("_sk_map_render_queue",
+				["queued"=>0,"updated"=>time()],
+				["dataset"=>$_POST['suffix'],
+				"branche"=>$_POST['branche'],
+				"bundesland"=>$_POST['bundesland']];
+			}
 		case "fetchAboData":
 			$ausgabe=array();	
 			$ausgabe['bundeslaender']=array();
