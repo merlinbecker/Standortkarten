@@ -2,6 +2,7 @@ dbconfig.php
 assets/js/jsconfig.js
 /vendor/
 composer.lock
+verwaltung/printdata
 # Swap
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]

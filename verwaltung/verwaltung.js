@@ -123,7 +123,7 @@ function holePrint(branche,bundesland,datensatz){
 		
 		//Formular für die Branchen-Bundesland-Datenbank Auswahl
 		var html=`
-		<div class="standorte_bbdb_auswahl">	
+		<div class="printqueue_bbdb_auswahl">	
 		<form class="form-inline">
 			<select class="form-control" id="pq_branche_select">
 				<option selected disabled>Branche wählen:</option>
@@ -144,122 +144,34 @@ function holePrint(branche,bundesland,datensatz){
 		`
 		$("#printwerk").append($(html));
 
-		//f�r jede branche und jedes Bundeland
+		let btn_gen_disabled=printqueue.queue.queued?"disabled":"";
+		let lnk_textfile="";
+		let last_update="nie";
+		if(printqueue.queue.updated>0){
+			let date = new Date(printqueue.queue.updated*1000);
+			let tag = "0"+ date.getDate();
+			let monat="0"+(date.getMonth()+1);
+			let jahr=date.getFullYear();
+			let hours="0"+ date.getHours();
+			let minutes = "0" + date.getMinutes();
+			let seconds = "0" + date.getSeconds();
+			last_update =tag+"."+monat+"."+jahr+" "+hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+		}
+		if(printqueue.queue.fn_text!="")lnk_textfile="<a href=\""+printqueue.queue.fn_text+"\" target=\"blank\">Standortliste herunterladen</a>";
+		html=`<li class="list-group-item">
+			<a href="${printqueue.queue.fn_din0}" target="_blank"><img src="${printqueue.queue.fn_preview}" border="0" /></a>
+			<br/>${lnk_textfile}
 
-		$.each(printqueue.queue,function(ind,value){
-			let html=`<li class="list-group-item">
-			#${value.id} (${getWerkArt(value.Art)})<h5 class="standort_name">${value.Name1} ${value.Name2} ${value.Name3}</h5>
-			${value.Strasse} | ${value.PLZStrasse} <span class="standort_ort"> ${value.Ort}</span><br/>
-			<span class="standort_tel">${value.Telefon} | ${value.Email} | ${value.Internet}</span>
-			<div class="collapse" id="standortmenu_${value.id}">
-			<br/><button type="button" class="standortedit btn btn-primary" data-ref="${value.id}"><i class="fa fa-edit"></i>&nbsp;Standort bearbeiten</button>&nbsp;
-			<button type="button" class="standortmove btn btn-primary" data-ref="${value.id}" data-lng="${value.lng}" data-lat="${value.lat}"><i class="fa fa-map-pin"></i>&nbsp;Standort verschieben</button>&nbsp;
-			<button type="button" class="standortdelete btn btn-danger" data-ref="${value.id}" ><i class="fa fa-trash"></i>&nbsp;Entfernen</button>	
-			</div>
+			<br/><button class="btn btn-primary" ${btn_gen_disabled}>Generierung beauftragen</a>
+			</li>
 			`;
-			let el=$(html);
-			el.click(function(evt){
-				$("#standortmenu_"+value.id).collapse();
-			});
-			$("#standorte_list").append(el);
-			$("#standortmenu_"+value.id).data("standort",value);
+		let el=$(html);
+		$("#printqueue_list").append(el);
+		
+		$("#pq_branche_select,#pq_bundesland_select,#pq_datenbank_select").change(function(evt){
+			holePrint($("#pq_branche_select").val(),$("#pq_bundesland_select").val(),$("#pq_datenbank_select").val());
 		});
-		
-		$("#st_branche_select,#st_bundesland_select,#st_datenbank_select").change(function(evt){
-			holeStandorte($("#st_branche_select").val(),$("#st_bundesland_select").val(),$("#st_datenbank_select").val());
-		});
-		var hackerList = new List('standort', standort_options);
-		hackerList.sort("standorte_name", {order:"asc"});
-		
-		
-		$(".standortdelete").click(function(evt){
-			if(confirm("Möchten Sie den Standort wirklich löschen?")){
-				var sid=$(this).attr("data-ref");
-				$.post( "#","command=deleteStandort&datensatz="+currentdatensatz+"&sid="+$(this).attr("data-ref"),function(data){
-				if(data=="success!"){
-					holeStandorte(currentbranche,currentbundesland,currentdatensatz);
-				}
-				});
-			}
-		});
-		
-		$(".standortmove").click(function(evt){
-			$("#moveStandortFormBody").empty();
-			if(map!=null)map.remove();
-			
-			$("#standortmove_sid").val($(this).attr("data-ref"));
-			$("#standortmove_datensatz").val(currentdatensatz);
-			
-			let html=`
-			<div class="alert alert-info" role="alert">
-			  Ziehen Sie die Karte, bis sich das Fadenkreuz über dem gewünschten neuen Standort befindet und klicken Sie auf <i>Standort versetzen</i>;.
-			</div>
-			  <div class="form-group">
-				<label for="standortmove_lat">Latitude</label>
-				<input type="text" readonly class="form-control-plaintext" id="standortmove_lat" name="lat" value="" />
-			  </div>
-			  <div class="form-group">
-				<label for="standortmove_lon">Longitude</label>
-				<input type="text" readonly class="form-control-plaintext" id="standortmove_lon" name="lon" value="" />
-			  </div>
-			  <button type="button" class="btn btn-primary mb-2" id="btn_moveStandort">Standort versetzen</button>
-			<div id="standortmove_map"></div>
-			`;
-			
-			$("#moveStandortFormBody").append($(html));
-			$("#standortmove_lat").val($(this).attr("data-lat"));
-			$("#standortmove_lon").val($(this).attr("data-lng"));
-			//now show the gui
-			$("#moveStandortModal").modal();
-		
-			let standort=$("#standortmenu_"+$(this).attr("data-ref")).data().standort;
-			//now init the map and put the pointer to it
-			map = L.map("standortmove_map", {
-			  zoom: 7,
-			  maxZoom:18,
-			  minZoom:7,
-			  maxBounds: bounds,
-			  useCache: true,
-			  crossOrigin: true,
-			  center: [51,10],
-			  layers: [osmde],
-			  zoomControl: true,
-			  attributionControl: true
-			});
-			
-			var feature={
-				properties:{
-					id:standort.id,
-					Art:standort.Art,
-					Name1:standort.Name1,
-					Name2:standort.Name2,
-					Name3:standort.Name3
-				}
-			}
-			
-			var latlng = new L.latLng($(this).attr("data-lat"), $(this).attr("data-lng"));
-			var temp=getMarkerColorsByBranche(currentbranche);
-			
-			currentmarker=createMarker(temp[0],temp[1],feature,latlng);	
-			currentmarker.addTo(map);
-			L.control.mapCenterCoord({
-				onMove:true
-			}).addTo(map);
-			
-			map.setView([$(this).attr("data-lat"),$(this).attr("data-lng")], 17);
-			
-			$("#btn_moveStandort").click(function(evt){
-				mitte=L.latLng(map.getCenter());
-				currentmarker.setLatLng(mitte);
-				map.setView(mitte, 17);
-				$("#standortmove_lat").val(mitte.lat);
-				$("#standortmove_lon").val(mitte.lng);
-			});
-			
-		});
-
-
-	});
+	});	
 }
 
 

@@ -15,15 +15,18 @@ th{
 .standorte_bbdb_auswahl{
 	padding-bottom:15px;
 }
-.standorte_bbdb_auswahl select{
+.standorte_bbdb_auswahl select, .printqueue_bbdb_auswahl select{
 	margin-left:5px;
 }
 .modal-lg{
 	max-width:2000px;
 }
 #standortmove_map {
-  width: auto;
-  min-height:800px;
-  height: 800px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  	width: auto;
+  	min-height:800px;
+  	height: 800px;
+  	box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+#printqueue_list {
+	margin-top:10px;
 }
