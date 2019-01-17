@@ -71,7 +71,7 @@ if(isset($_POST['command'])){
 			$suffix=$_POST['suffix'];
 
 			$ausgabe['queue']=$db->run("SELECT queued,updated FROM _sk_map_render_queue WHERE dataset=? AND bundesland=? AND branche=?",$suffix,$_POST['bundesland'],$_POST['branche']);
-			if(count($ausgabe['queue']==0){
+			if(count($ausgabe['queue'])==0){
 				$db->insert("_sk_map_render_queue",array("dataset"=>$suffix,"bundesland"=>$_POST['bundesland'],"branche"=>$_POST['branche']));
 				$ausgabe['queue']['queued']=0;
 				$ausgabe['queue']['updated']=0;
