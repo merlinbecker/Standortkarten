@@ -144,9 +144,10 @@ function holePrint(branche,bundesland,datensatz){
 		`
 		$("#printwerk").append($(html));
 
-		let btn_gen_disabled=printqueue.queue.queued?"disabled":"";
+
 		let lnk_textfile="";
 		let last_update="nie";
+		
 		if(printqueue.queue.updated>0){
 			let date = new Date(printqueue.queue.updated*1000);
 			let tag = "0"+ date.getDate();
@@ -161,13 +162,14 @@ function holePrint(branche,bundesland,datensatz){
 		html=`<li class="list-group-item">
 			<a href="${printqueue.queue.fn_din0}" target="_blank"><img src="${printqueue.queue.fn_preview}" border="0" /></a>
 			<br/>${lnk_textfile}
-
-			<br/><button class="btn btn-primary" ${btn_gen_disabled}>Generierung beauftragen</a>
+			<br/>Letztes Update: ${last_update}
+			<br/><button class="btn_start_gen btn btn-primary">Generierung beauftragen</button><button class="btn_is_generating btn btn-secondary" disabled>Generierung läuft <i class="fa fa-spinner fa-spin"></i></button>
 			</li>
 			`;
 		let el=$(html);
 		$("#printqueue_list").append(el);
-		
+		if(printqueue.queue.queued)$(".btn_start_gen").css("display","none");
+		else $(".btn_is_generating").css("display","none");
 		$("#pq_branche_select,#pq_bundesland_select,#pq_datenbank_select").change(function(evt){
 			holePrint($("#pq_branche_select").val(),$("#pq_bundesland_select").val(),$("#pq_datenbank_select").val());
 		});

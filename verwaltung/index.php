@@ -49,6 +49,13 @@ if(isset($_POST['command'])){
 			$ausgabe['standorte']=$db->run("SELECT * FROM ".$tabelle.$condition);
 			echo json_encode($ausgabe);
 		break;
+		case "setPrintingQueue":
+			if(isset($_POST['branche'],$_POST['bundesland'],$_POST['datensatz'],$_POST['queue'])){
+				if(is_numeric($_POST['queue']){
+					$db->update("_sk_render_queue",array()
+				}
+			}	
+		break;
 		case "fetchPrintingQueue":
 			//first of all, check if the queue table exists
 			try{
