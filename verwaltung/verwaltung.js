@@ -126,15 +126,15 @@ function holePrint(branche,bundesland,datensatz){
 		<div class="printqueue_bbdb_auswahl">	
 		<form class="form-inline">
 			<select class="form-control" id="pq_branche_select">
-				<option selected disabled>Branche wählen:</option>
+				<option disabled> Branche wählen:</option>
 				${branchen}
 			</select>
 			<select class="form-control" id="pq_bundesland_select">
-				<option selected disabled>Bundesland wählen:</option>
+				<option disabled>Bundesland wählen:</option>
 				${bundeslaender}
 			</select>
 			<select class="form-control" id="pq_datenbank_select">
-				<option selected disabled>Datensatz wählen:</option>
+				<option disabled>Datensatz wählen:</option>
 				${datenbank}
 			</select>
 		</form></div>
@@ -163,7 +163,7 @@ function holePrint(branche,bundesland,datensatz){
 			<a href="${printqueue.queue.fn_din0}" target="_blank"><img src="${printqueue.queue.fn_preview}" border="0" /></a>
 			<br/>${lnk_textfile}
 			<br/>Letztes Update: ${last_update}
-			<br/><button class="btn_start_gen btn btn-primary">Generierung beauftragen</button><button class="btn_is_generating btn btn-secondary" disabled>Generierung l�uft <i class="fa fa-spinner fa-spin"></i></button>
+			<br/><button class="btn_start_gen btn btn-primary">Generierung beauftragen</button><button class="btn_is_generating btn btn-secondary" disabled>Generierung l&auml;uft <i class="fa fa-spinner fa-spin"></i></button>
 			</li>
 			`;
 		let el=$(html);
@@ -172,6 +172,21 @@ function holePrint(branche,bundesland,datensatz){
 		else $(".btn_is_generating").css("display","none");
 		$("#pq_branche_select,#pq_bundesland_select,#pq_datenbank_select").change(function(evt){
 			holePrint($("#pq_branche_select").val(),$("#pq_bundesland_select").val(),$("#pq_datenbank_select").val());
+		});
+		$(".btn_start_gen").click(function(evt){
+			let branche=$("#pq_branche_select").find("option:selected").val();
+			let bundesland=$("#pq_bundesland_select").find("option:selected").val();
+			let datensatz=$("#pq_datenbank_select").find("option:selected").val();
+			$(this).attr("disabled","disabled");
+			$.post("#","command=setPrintingQueue&branche="+branche+"&bundesland="+bundesland+"&datensatz="+datensatz+"&queue=1",function(data) {
+				let answer=JSON.parse(data);
+				if(answer.status=="success"){
+					$(".btn_start_gen").css("display","none");
+					$(".btn_is_generating").css("display","block");
+				}
+				else $(".btn_start_gen").removeAttr("disabled");
+			});
+
 		});
 	});	
 }

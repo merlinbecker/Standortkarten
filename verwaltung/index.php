@@ -51,10 +51,15 @@ if(isset($_POST['command'])){
 		break;
 		case "setPrintingQueue":
 			if(isset($_POST['branche'],$_POST['bundesland'],$_POST['datensatz'],$_POST['queue'])){
-				if(is_numeric($_POST['queue']){
-					$db->update("_sk_render_queue",array()
+				if(is_numeric($_POST['queue'])){
+					$db->update("_sk_map_render_queue",array("queued"=>$_POST['queue']),array("dataset"=>$_POST['datensatz'],"branche"=>$_POST['branche'],"bundesland"=>$_POST['bundesland']));
+					$ausgabe=array("status"=>"success");
+				}else{
+					$ausgabe=array("status"=>"error");
 				}
-			}	
+				echo json_encode($ausgabe);
+			}
+			else die(json_encode(array("status"=>"error")));	
 		break;
 		case "fetchPrintingQueue":
 			//first of all, check if the queue table exists
@@ -74,13 +79,18 @@ if(isset($_POST['command'])){
 			$ausgabe=array();
 			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland");
 			$ausgabe['branchen']=$db->run("SELECT * FROM _sk_branche");
-			
+
+
 			$suffix=$_POST['suffix'];
-			$ausgabe['queue']=$db->row("SELECT queued,updated " 
+			$exists=$db->single("SELECT COUNT(queued)" 
+					."FROM _sk_map_render_queue WHERE dataset=? " 
+					."AND bundesland=? AND branche=?",array($suffix,$_POST['bundesland'],$_POST['branche']));
+			if($exists>0)
+				$ausgabe['queue']=$db->row("SELECT queued,updated " 
 					."FROM _sk_map_render_queue WHERE dataset=? " 
 					."AND bundesland=? AND branche=?",
 					$suffix,$_POST['bundesland'],$_POST['branche']);
-			if(count($ausgabe['queue'])==0){
+			else{
 				$db->insert("_sk_map_render_queue",
 					array("dataset"=>$suffix,
 					"bundesland"=>$_POST['bundesland'],
