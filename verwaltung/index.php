@@ -61,6 +61,10 @@ if(isset($_POST['command'])){
 			}
 			else die(json_encode(array("status"=>"error")));	
 		break;
+		case "fetchAllPrintingQueue":
+			$ausgabe=$db->run("SELECT * FROM _sk_map_render_queue WHERE queued=1");
+			echo json_encode($ausgabe);
+		break;
 		case "fetchPrintingQueue":
 			//first of all, check if the queue table exists
 			try{
