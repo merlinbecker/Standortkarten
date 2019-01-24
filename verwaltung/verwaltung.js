@@ -156,7 +156,7 @@ function holePrint(branche,bundesland,datensatz){
 			let hours="0"+ date.getHours();
 			let minutes = "0" + date.getMinutes();
 			let seconds = "0" + date.getSeconds();
-			last_update =tag+"."+monat+"."+jahr+" "+hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+			last_update =tag.substr(-2)+"."+monat+"."+jahr+" "+hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 		}
 		if(printqueue.queue.fn_text!="")lnk_textfile="<a href=\""+printqueue.queue.fn_text+"\" target=\"blank\">Standortliste herunterladen</a>";
 		html=`<li class="list-group-item">
@@ -168,8 +168,14 @@ function holePrint(branche,bundesland,datensatz){
 			`;
 		let el=$(html);
 		$("#printqueue_list").append(el);
-		if(printqueue.queue.queued)$(".btn_start_gen").css("display","none");
-		else $(".btn_is_generating").css("display","none");
+		if(printqueue.queue.queued==1){
+			$(".btn_is_generating").css("display","block");
+			$(".btn_start_gen").css("display","none");
+		}
+		else{
+			$(".btn_is_generating").css("display","none");
+			$(".btn_start_gen").css("display","block");
+		}
 		$("#pq_branche_select,#pq_bundesland_select,#pq_datenbank_select").change(function(evt){
 			holePrint($("#pq_branche_select").val(),$("#pq_bundesland_select").val(),$("#pq_datenbank_select").val());
 		});

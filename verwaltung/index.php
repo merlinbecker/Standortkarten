@@ -113,7 +113,7 @@ if(isset($_POST['command'])){
 			$ausgabe['queue']['fn_preview']="printdata/preview".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".png";
 			if(!is_file($ausgabe['queue']['fn_preview']))$ausgabe['queue']['fn_preview']="";
 
-			$ausgabe['queue']['fn_text']="printdata/test".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".txt";
+			$ausgabe['queue']['fn_text']="printdata/text".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".txt";
 			if(!is_file($ausgabe['queue']['fn_text']))$ausgabe['queue']['fn_text']="";
 			
 			echo json_encode($ausgabe);
@@ -211,7 +211,7 @@ if(isset($_POST['command'])){
 		break;
 		case "changeSettings":
 			//zunächst alle Zuordnungen löschen
-			$db->delete("_sk_nutzer",["nutzerid"=>$_POST['uid']]);
+			$db->delete("_sk_nutzer_bundesland_branche",["nutzerid"=>$_POST['uid']]);
 			
 			//dann wieder einfügen
 			foreach($_POST['bubra'] as $bundesland => $branchen){
