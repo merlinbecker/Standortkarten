@@ -81,7 +81,7 @@ if(isset($_POST['command'])){
 			}
 
 			$ausgabe=array();
-			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland");
+			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland WHERE id<=12");
 			$ausgabe['branchen']=$db->run("SELECT * FROM _sk_branche");
 
 
