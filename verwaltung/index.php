@@ -33,10 +33,16 @@ if(isset($_POST['command'])){
 			if(is_numeric($_POST['branche'])&&$_POST['branche']>0){
 				$condition=" WHERE branche=".$_POST['branche'];
 			}
+			
 			if(is_numeric($_POST['bundesland'])&&$_POST['bundesland']>0){
 				if($condition=="")$condition=" WHERE ";
 				else $condition.=" AND ";
 				$condition.="bundesland=".$_POST['bundesland'];
+			}
+			$sort="";
+			if(isset($_POST['sort_alphabetical'])){
+				if($_POST['sort_alphabetical'])
+					$sort=" ORDER BY Name1";
 			}
 			$ausgabe=array();
 		
@@ -46,7 +52,7 @@ if(isset($_POST['command'])){
 			
 			$ausgabe['bundeslaender']=$db->run("SELECT * FROM _sk_bundesland");
 			$ausgabe['branchen']=$db->run("SELECT * FROM _sk_branche");
-			$ausgabe['standorte']=$db->run("SELECT * FROM ".$tabelle.$condition);
+			$ausgabe['standorte']=$db->run("SELECT * FROM ".$tabelle.$condition.$sort);
 			echo json_encode($ausgabe);
 		break;
 		case "setPrintingQueue":
@@ -115,6 +121,9 @@ if(isset($_POST['command'])){
 
 			$ausgabe['queue']['fn_text']="printdata/text".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".txt";
 			if(!is_file($ausgabe['queue']['fn_text']))$ausgabe['queue']['fn_text']="";
+			
+			$ausgabe['queue']['fn_text_alphabetical']="printdata/text_alphabet".$suffix."_".$_POST['bundesland']."_".$_POST['branche'].".txt";
+			if(!is_file($ausgabe['queue']['fn_text_alphabetical']))$ausgabe['queue']['fn_text_alphabetical']="";
 			
 			echo json_encode($ausgabe);
 		break;

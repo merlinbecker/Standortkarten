@@ -145,7 +145,7 @@ function holePrint(branche,bundesland,datensatz){
 		$("#printwerk").append($(html));
 
 
-		let lnk_textfile="";
+		let lnk_textfile,ln_textfile_alphabetical="";
 		let last_update="nie";
 		
 		if(printqueue.queue.updated>0){
@@ -158,9 +158,10 @@ function holePrint(branche,bundesland,datensatz){
 			let seconds = "0" + date.getSeconds();
 			last_update =tag.substr(-2)+"."+monat+"."+jahr+" "+hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 		}
-		if(printqueue.queue.fn_text!="")lnk_textfile="<a href=\""+printqueue.queue.fn_text+"\" target=\"blank\">Standortliste herunterladen</a>";
+		if(printqueue.queue.fn_text!="")lnk_textfile="<a href=\""+printqueue.queue.fn_text+"\" download=\"Standortliste\">Standortliste herunterladen</a>";
+		if(printqueue.queue.fn_text_alphabetical!="")ln_textfile_alphabetical="<a href=\""+printqueue.queue.fn_text_alphabetical+"\" download=\"Standortliste_alphabetisch\">Standortliste (alphabetisch) herunterladen</a>";
 		html=`<li class="list-group-item">
-			<a href="${printqueue.queue.fn_din0}" target="_blank"><img src="${printqueue.queue.fn_preview}" border="0" /></a>
+			<a href="${printqueue.queue.fn_din0}" download><img src="${printqueue.queue.fn_preview}" border="0" /></a>
 			<br/>${lnk_textfile}
 			<br/>Letztes Update: ${last_update}
 			<br/><button class="btn_start_gen btn btn-primary">Generierung beauftragen</button><button class="btn_is_generating btn btn-secondary" disabled>Generierung l&auml;uft <i class="fa fa-spinner fa-spin"></i></button>
