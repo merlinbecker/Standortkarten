@@ -158,8 +158,8 @@ function holePrint(branche,bundesland,datensatz){
 			let seconds = "0" + date.getSeconds();
 			last_update =tag.substr(-2)+"."+monat+"."+jahr+" "+hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 		}
-		if(printqueue.queue.fn_text!="")lnk_textfile="<a href=\""+printqueue.queue.fn_text+"\" download=\"Standortliste\">Standortliste herunterladen</a>";
-		if(printqueue.queue.fn_text_alphabetical!="")lnk_textfile_alphabetical="<a href=\""+printqueue.queue.fn_text_alphabetical+"\" download=\"Standortliste_alphabetisch\">Standortliste (alphabetisch) herunterladen</a>";
+		if(printqueue.queue.fn_text!="")lnk_textfile="<a href=\""+printqueue.queue.fn_text+"\" download=\"Standortliste.txt\">Standortliste herunterladen</a>";
+		if(printqueue.queue.fn_text_alphabetical!="")lnk_textfile_alphabetical="<a href=\""+printqueue.queue.fn_text_alphabetical+"\" download=\"Standortliste_alphabetisch.txt\">Standortliste (alphabetisch) herunterladen</a>";
 		html=`<li class="list-group-item">
 			<a href="${printqueue.queue.fn_din0}" download><img src="${printqueue.queue.fn_preview}" border="0" /></a>
 			<br/>${lnk_textfile}

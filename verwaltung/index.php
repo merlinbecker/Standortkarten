@@ -186,7 +186,7 @@ if(isset($_POST['command'])){
 				
 				$nachricht.="<p>vielen Dank für Ihre Bestellung der Standortkarte(n) in elektronischer Form.</p>";
 				$nachricht.="Anbei erhalten Sie Ihren persönlichen Aktivierungslink.<br/>";
-				$nachricht.="Klicken Sie auf den folgenden Link (oder kopieren ihn in einen Browser Ihrer Wahl).<br/>";
+				$nachricht.="Klicken Sie auf den folgenden Link (odhttps://www.fileee.com/er kopieren ihn in einen Browser Ihrer Wahl).<br/>";
 				$nachricht.="Sie werden dann aufgefordert, ein Passwort für das Login zu vergeben.<br/>";
 				$nachricht.="<a href=\"http://standortkarten.geoplangmbh.de/activate.php?a=".$activation."\">http://standortkarten.geoplangmbh.de/activate.php?a=".$activation."</a>";
 				$nachricht.="<p>Nachdem Sie Ihren Zugang aktiviert haben, können sie sich in die Standortkaten Baustoffe einloggen.</p>";
