@@ -42,12 +42,11 @@ $(document).ready(function(evt){
 		return false;
 	});
 	$("#editStandortForm").submit(function(evt){
-		$.post( "#","command=editStandort&"+$(this).serialize(),function(data){
-			if(data=="success!"){
-				$("#editStandortModal").modal('hide');
-				holeStandorte(currentbranche,currentbundesland,currentdatensatz);
-			}
-			
+		$.post("#","command=editStandort&post="+btoa($(this).serialize()),function(data){
+				if(data=="success!"){
+					$("#editStandortModal").modal('hide');
+					holeStandorte(currentbranche,currentbundesland,currentdatensatz);
+				}
 		});
 		evt.stopPropagation();
 		return false;

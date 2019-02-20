@@ -155,12 +155,12 @@ if(isset($_POST['command'])){
 			}
 		break;
 		case "editStandort":
+			parse_str(base64_decode($_POST['post']),$_POST);
 			if(isset($_POST['id'],$_POST['suffix'])){
 				$ident=$_POST['id'];
 				$suffix=$_POST['suffix'];
-				unset($_POST['id'],$_POST['suffix'],$_POST['command']);
-
-				$db->update("_sk_standorte".$suffix,$_POST,["id"=>$ident]);
+				unset($_POST['id'],$_POST['suffix'],$_POST['post']);
+				$db->update("_sk_standorte".$suffix,$_POST,array("id"=>$ident));
 				echo "success!";
 			}
 		break;
