@@ -175,6 +175,9 @@ function pinsRecieved(data){
 				case 9:
 				branche_recycling2018.addData(value);
 				break;
+				case 10:
+				branche_kiesundsand2019.addData(value);
+				break;
 				
 			}
 			
@@ -341,6 +344,9 @@ function prepareResults(){
 				case 9:
 				markerClusters.addLayer(branche_recycling2018);
 				break;
+				case 10:
+				markerClusters.addLayer(branche_kiesundsand2019);
+				break;
 			 }
 			syncSidebar();
 		  }
@@ -378,7 +384,9 @@ function prepareResults(){
 				case 9:
 				markerClusters.removeLayer(branche_recycling2018);
 				break;
-				
+				case 10:
+				markerClusters.removeLayer(branche_kiesundsand2019);
+				break;
 				 
 			 }
 		syncSidebar();
@@ -741,9 +749,18 @@ function prepareResults(){
 		  }
 		}
 		if (datum.source === "KiesundSand") {
-		  if (!map.hasLayer(obj_layer_branchen[3])) {
-			map.addLayer(obj_layer_branchen[3]);
+		  if(obj_layer_branchen[3]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[3])) {
+				map.addLayer(obj_layer_branchen[3]);
+			  }
 		  }
+		  if(obj_layer_branchen[10]!=undefined){
+			  if (!map.hasLayer(obj_layer_branchen[10])) {
+				map.addLayer(obj_layer_branchen[10]);
+			  }
+		  }
+		  
+		  
 		  map.setView([datum.lat, datum.lng], 17);
 		  if (map._layers[datum.id]) {
 			map._layers[datum.id].fire("click");
@@ -1393,6 +1410,14 @@ function syncSidebar() {
       }
     }
   });
+  branche_kiesundsand2019.eachLayer(function (layer) {
+    if (map.hasLayer(obj_layer_branchen[10])) {
+      if (map.getBounds().contains(layer.getLatLng())) {
+		  var css_class="icon_10";
+		standortInfos(layer,css_class);
+      }
+    }
+  });
   /* Update list.js featureList */
   featureList = new List("features", {
     valueNames: ["feature-name"]
@@ -1572,6 +1597,22 @@ var branche_recycling2018 = L.geoJson(null, {
 });
 
 var branche_kiesundsand = L.geoJson(null, {
+  pointToLayer: function (feature, latlng) {
+	return createMarker("FireBrick","white",feature,latlng)
+},
+  onEachFeature: function (feature, layer) {
+    if (feature.properties) {
+      layer.on({
+        click: function (e) {
+          showStandortInfos(feature);
+        }
+      });
+      kiesundsandSearch.push(addToSearch("KiesundSand",feature,layer));
+    }
+  }
+});
+
+var branche_kiesundsand2019 = L.geoJson(null, {
   pointToLayer: function (feature, latlng) {
 	return createMarker("FireBrick","white",feature,latlng)
 },

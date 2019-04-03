@@ -148,6 +148,7 @@ function getMarkerColorsByBranche(branche){
 			return ["seagreen","white"];
 		break;
 		case 3:
+		case 10:
 			return ["FireBrick","white"];
 		break;
 		case 4:

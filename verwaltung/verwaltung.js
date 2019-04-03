@@ -29,6 +29,7 @@ $(document).ready(function(evt){
 	$("#abo").show();
 	$("#standort").hide();
 	$("#printwerk").hide();
+	$("#import").hide();
 	
 	$(".nav-link").click(function(evt){
 		if($(this).hasClass("disabled")) return false;
@@ -91,8 +92,9 @@ $(document).ready(function(evt){
 	holeAbonnenten();
 	holeStandorte(1,1,"_v2");
 	holePrint(1,1,"_v2");
+	setupBatchImport();
 });
-
+function setupBatchImport()
 function holePrint(branche,bundesland,datensatz){
 	$.post("#","command=fetchPrintingQueue&branche="+branche+"&bundesland="+bundesland+"&suffix="+datensatz,function(data){
 		$("#printwerk").empty();	

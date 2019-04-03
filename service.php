@@ -158,39 +158,26 @@ if(isset($_POST['d'])){
 		/* !getPins */
 		/*liefert die Pins nach Bundesland oder Branche*/
 		case "getPins":
-			if(isLoggedIn()&&isset($data->bundesland,$data->branche)){				
-				//Bundesland und Branche vermischen
+			if(isLoggedIn()&&isset($data->bundesland,$data->branche)){
 				$laender=explode(",",$data->bundesland);
+				$branchen=explode(",",$data->branche);
+				$filter=array();
 				
-				//mysql injection test
 				foreach($laender as $land){
 					if(!is_numeric($land))output_error();
 				}
-				$branchen=explode(",",$data->branche);
-
 				foreach($branchen as $branche){
 					if(!is_numeric($branche))output_error();
-				}
-
-				//Natursteinfix
-				if(in_array(4,$branchen)){
-					if(in_array(6,$laender)||in_array(11,$laender)){
-					$laender[]=13;
+					$anfrage="SELECT bundesland FROM `_sk_nutzer_bundesland_branche` WHERE nutzerid=".$_SESSION['nutzer']['id']." AND branche=".$branche;
+					$bls=$db->run($anfrage);
+					foreach ($bls as $bl){
+						$filter[]="(branche=".$branche." AND bundesland=".$bl['bundesland'].")";
 					}
-					if(in_array(9,$laender)||in_array(3,$laender)||in_array(5,$laender)){
-					$laender[]=14;
-					}
+					$filter[]=implode(" OR ",$filter);
 				}
-				
-				//die neue Filterung abspeichern
-				$filtersettings=array();
-				$filtersettings['laender']=$laender;
-				$filtersettings['branchen']=$branchen;
-				
-				$_SESSION['nutzer']['filtersettings']=$filtersettings;
-				
-				
-				$anfrage="SELECT * FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE ".filternachBranchen()." ORDER by lat DESC";
+				$filter=implode(" OR ",$filter);
+			
+				$anfrage="SELECT * FROM _sk_standorte".$_SESSION['testversion_suffix']." WHERE ".$filter." ORDER by lat DESC";
 				$pins=$db->run($anfrage);
 				
 				$result['data']['type']="FeatureCollection";
@@ -238,41 +225,6 @@ function output_error(){
 	$result['status']="error";
 	$result['version']=VERSION;
 	die(base64_encode(json_encode($result)));
-}
-
-/**
-Filter für die ausgewählten Branchen und Bundesländer
-
-@version 1.0
-@date 30.04.2014
-@version 1.0
-
-@return MySQL kondition für die Einschränkung nach Branchen und Bundesländern
-**/
-function filternachBranchen(){
-	$kondition="";
-	$kriterium=array();
-	if(count($_SESSION['nutzer']['filtersettings']['laender'])==0){
-		$kondition="branche IN (".implode(",",$_SESSION['nutzer']['filtersettings']['branchen']).")";
-	}
-	else if(count($_SESSION['nutzer']['filtersettings']['branchen'])==0){
-		$kondition="bundesland IN (".implode(",",$_SESSION['nutzer']['filtersettings']['laender']).")";
-	}
-	else{
-		foreach($_SESSION['nutzer']['filtersettings']['laender'] as $land){
-			$landeskriterium=array();
-					if(is_numeric($land)){
-					foreach($_SESSION['nutzer']['filtersettings']['branchen'] as $branche){
-						if(is_numeric($branche)){
-						$landeskriterium[]="(bundesland=".$land." AND branche=".$branche.")";
-						}
-		}
-		$kriterium[]=implode("OR",$landeskriterium);
-	}
-	}
-	$kondition=implode("OR",$kriterium);
-	}	
-	return $kondition;
 }
 
 /**prüft ob der Nutzer bereits eingeloggt ist
