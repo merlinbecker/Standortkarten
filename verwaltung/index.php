@@ -184,14 +184,14 @@ if(isset($_POST['command'])){
 				if($_POST['anrede']=="Herr")$nachricht.="<p>Sehr geehrter ".$_POST['anrede']." ".$_POST['name'].",</p>";
 				else $nachricht.="<p>Sehr geehrte ".$_POST['anrede']." ".$_POST['name'].",</p>";
 				
-				$nachricht.="<p>vielen Dank für Ihre Bestellung der Standortkarte(n) in elektronischer Form.</p>";
-				$nachricht.="Anbei erhalten Sie Ihren persönlichen Aktivierungslink.<br/>";
-				$nachricht.="Klicken Sie auf den folgenden Link (odhttps://www.fileee.com/er kopieren ihn in einen Browser Ihrer Wahl).<br/>";
-				$nachricht.="Sie werden dann aufgefordert, ein Passwort für das Login zu vergeben.<br/>";
-				$nachricht.="<a href=\"http://standortkarten.geoplangmbh.de/activate.php?a=".$activation."\">http://standortkarten.geoplangmbh.de/activate.php?a=".$activation."</a>";
-				$nachricht.="<p>Nachdem Sie Ihren Zugang aktiviert haben, können sie sich in die Standortkaten Baustoffe einloggen.</p>";
+					$nachricht.="<p>vielen Dank fÃ¼r Ihre Bestellung der Standortkarte(n) in elektronischer Form.</p>";
+				$nachricht.="Anbei erhalten Sie Ihren persÃ¶nlichen Aktivierungslink.<br/>";
+				$nachricht.="Klicken Sie auf den folgenden Link (oder kopieren ihn in einen Browser Ihrer Wahl).<br/>";
+				$nachricht.="Sie werden dann aufgefordert, ein Passwort fÃ¼r das Login zu vergeben.<br/>";
+				$nachricht.="<a href=\"https://bso.stein-verlaggmbh.de/activate.php?a=".$activation."\">https://bso.stein-verlaggmbh.de/activate.php?a=".$activation."</a>";
+				$nachricht.="<p>Nachdem Sie Ihren Zugang aktiviert haben, kÃ¶nnen sie sich in die Standortkaten Baustoffe einloggen.</p>";
 				$nachricht.="<p>Mit freundlichen Grüßen,<br>Ihr Stein-Verlag Baden-Baden</p>";
-				$nachricht.="<p><img border=\"0\" src=\"http://standortkarten.geoplangmbh.de/daten/bilder/logo_stein.jpg\"></p>";
+				$nachricht.="<p><img border=\"0\" src=\"https://bso.stein-verlaggmbh.de/assets/img/logo_stein.png\"></p>";
 				$nachricht.="</body></html>";
 				
 				// für HTML-E-Mails muss der 'Content-type'-Header gesetzt werden
