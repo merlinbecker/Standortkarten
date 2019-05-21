@@ -39,7 +39,7 @@ if(isset($_POST['command'])){
 				else $condition.=" AND ";
 				$condition.="bundesland=".$_POST['bundesland'];
 			}
-			$sort="";
+			$sort=" ORDER BY id";
 			if(isset($_POST['sort_alphabetical'])){
 				if($_POST['sort_alphabetical'])
 					$sort=" ORDER BY Name1";
