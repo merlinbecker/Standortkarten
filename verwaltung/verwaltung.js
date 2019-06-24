@@ -18,11 +18,7 @@ var datensaetze=[{
 		{
 			id:"_v2",
 			beschreibung:"Standorte (nach 2012)"
-		},
-		{
-			id:"",
-			beschreibung:"Standorte (vor 2012)"
-		},
+		}
 		];
 
 $(document).ready(function(evt){
