@@ -285,7 +285,7 @@ function login($logindata,$db){
 			$result['testversion']="Normalversion";	
 		}
 		else{
-			$_SESSION['testversion_suffix']="";
+			$_SESSION['testversion_suffix']="_v2";
 			$_SESSION['nutzer']['testversion']="Normalversion";
 			$result['testversion']="Normalversion";
 		}
